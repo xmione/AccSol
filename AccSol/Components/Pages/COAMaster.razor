@@ -1,0 +1,139 @@
+﻿@page "/coa-master"
+@implements IDisposable
+@using AccSol.Models
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+
+
+
+<PageTitle>Chart Of Accounts</PageTitle>
+
+<h1>Chart Of Accounts</h1>
+
+<div>
+    <AuthorizeView>
+        <Authorized>
+            <div class="row">
+                <div class="col-md-6">
+                    <a href='/coa-add' class="btn btn-primary" role="button">
+                        <i class="fas fa-user-plus"></i>
+                        Add Account
+                    </a>
+                </div>
+                <div class="input-group col">
+                    <input type="text" class="form-control" placeholder="Search by name"
+                           @bind="SearchString" @bind:event="oninput" @onkeyup="Filter" />
+                    @if (SearchString.Length > 0)
+                    {
+                        <div class="input-group-append">
+                            <button class="btn btn-danger" @onclick="ResetSearch">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+            <br />
+            @if (list == null)
+            {
+                <p><em>Loading...</em></p>
+            }
+            else
+            {
+                <table class="table table-striped align-middle table-bordered">
+                    <thead class="table-success">
+                        <tr>
+                            <th>ID</th>
+                            <th>Category</th>
+                            <th>Account Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var coa in list)
+                        {
+                            <tr>
+                                <td>@coa.ID</td>
+                                <td>@coa.Category</td>
+                                <td>@coa.AccountName</td>
+                                <td>
+                                    <a href='/coa-edit/@coa.ID' class="btn btn-outline-dark" role="button">
+                                        Edit
+                                    </a>
+                                    <a href='/coa-delete/@coa.ID' class="btn btn-outline-danger" role="button">
+                                        Delete
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            }
+
+        </Authorized>
+        <NotAuthorized>
+            <div class="nav-item px-3">
+                You are not authorized to view this page.
+            </div>
+
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+
+@code {
+    protected List<Coa>? list = new();
+    protected List<Coa>? searchData = new();
+    protected Coa coa = new();
+    protected string SearchString { get; set; } = string.Empty;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await Get();
+    }
+    protected async Task Get()
+    {
+        list = await Http.GetFromJsonAsync<List<Coa>>("api/Coas");
+        searchData = list;
+    }
+    protected void Filter()
+    {
+        if (!string.IsNullOrEmpty(SearchString))
+        {
+            list = searchData?
+                .Where(x => x.AccountName.IndexOf(SearchString, StringComparison.OrdinalIgnoreCase) != -1)
+                .ToList();
+        }
+        else
+        {
+            list = searchData;
+        }
+    }
+    protected void DeleteConfirm(int id)
+    {
+        coa = list.FirstOrDefault(x => x.ID == id);
+    }
+    public void ResetSearch()
+    {
+        SearchString = string.Empty;
+        list = searchData;
+    }
+
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}
