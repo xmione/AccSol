@@ -1,4 +1,4 @@
-using AccSol.Data;
+using AccSol.EF.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;

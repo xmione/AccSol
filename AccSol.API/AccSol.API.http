@@ -1,0 +1,6 @@
+@AccSol.API_HostAddress = http://localhost:5049
+
+GET {{AccSol.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

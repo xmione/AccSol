@@ -1,0 +1,159 @@
+﻿Category,Account Name,SubCategory
+ASSETS,Cash in bank - AUB USD, CASH  
+ASSETS,Cash in bank - AUB Savings, CASH  
+ASSETS,Cash in bank - BDO, CASH  
+ASSETS,Cash in bank - BPI, CASH  
+ASSETS,Cash in bank - Eastwest bank, CASH  
+ASSETS,Cash in bank - PBCom, CASH  
+ASSETS,Cash in bank - PNB Savings, CASH  
+ASSETS,Petty Cash Fund- Office, CASH  
+ASSETS,Cash in bank - RCBC, CASH  
+ASSETS,Cash on hand, CASH  
+ASSETS,Accounts receivable, TRADE AND OTHER RECEIVABLES 
+ASSETS,Accounts Receivable-Employees, TRADE AND OTHER RECEIVABLES 
+ASSETS,Advances from employees, TRADE AND OTHER RECEIVABLES 
+ASSETS,Other receivable, TRADE AND OTHER RECEIVABLES 
+ASSETS,Advances to suppliers, TRADE AND OTHER RECEIVABLES 
+ASSETS,Cash Advance, TRADE AND OTHER RECEIVABLES 
+ASSETS,Inventory asset, INVENTORIES 
+ASSETS,Training Kit, INVENTORIES 
+ASSETS,Office supplies inventory, INVENTORIES 
+ASSETS,Input VAT,OTHER CURRENT ASSETS
+ASSETS,Deferred Input VAT,OTHER CURRENT ASSETS
+ASSETS,Creditable income tax,OTHER CURRENT ASSETS
+ASSETS,Creditable input VAT,OTHER CURRENT ASSETS
+ASSETS,Prepaid Expenses,OTHER CURRENT ASSETS
+ASSETS,Security Deposit,OTHER CURRENT ASSETS
+ASSETS,Prepaid Rental,OTHER CURRENT ASSETS
+ASSETS,Prepaid Taxes,OTHER CURRENT ASSETS
+ASSETS,Prepaid Insurance,OTHER CURRENT ASSETS
+ASSETS,Rental Deposit,OTHER CURRENT ASSETS
+ASSETS,Computer Equipment,PROPERTY AND EQUIPMENT
+ASSETS,Accumulated Depreciation - comp. equip.,PROPERTY AND EQUIPMENT
+ASSETS,Furniture and Fixtures,PROPERTY AND EQUIPMENT
+ASSETS,Accum. Dep. - furnitures and fixtures,PROPERTY AND EQUIPMENT
+ASSETS,Leasehold Improvement,PROPERTY AND EQUIPMENT
+ASSETS,Accum. Dep. - leasehold improvement,PROPERTY AND EQUIPMENT
+ASSETS,Office equipment,PROPERTY AND EQUIPMENT
+ASSETS,Accum. Dep. - office equipment,PROPERTY AND EQUIPMENT
+ASSETS,Transportation equipment,PROPERTY AND EQUIPMENT
+ASSETS,Accum. Dep. - transportation equip.,PROPERTY AND EQUIPMENT
+ASSETS,Deferred tax asset,OTHER NON - CURRENT ASSETS
+ASSETS,Bonds-Refundable,OTHER NON - CURRENT ASSETS
+ LIABILITIES ,Accounts payable,ACCOUNTS PAYABLE
+ LIABILITIES ,Salaries Payable,ACCOUNTS PAYABLE
+ LIABILITIES ,Accounts payable - USD,ACCOUNTS PAYABLE
+ LIABILITIES ,Advances - Others,ACCOUNTS PAYABLE
+ LIABILITIES ,Security deposit - Converge,ACCOUNTS PAYABLE
+ LIABILITIES ,Advances from Customers,ACCOUNTS PAYABLE
+ LIABILITIES ,Income tax payable,OTHER PAYABLES
+ LIABILITIES ,HDMF Payable,OTHER PAYABLES
+ LIABILITIES ,HDMF Loan Payable,OTHER PAYABLES
+ LIABILITIES ,SSS Payable,OTHER PAYABLES
+ LIABILITIES ,SSS Loan Payable,OTHER PAYABLES
+ LIABILITIES ,Philhealth Payable,OTHER PAYABLES
+ LIABILITIES ,Expanded withholding tax payable,OTHER PAYABLES
+ LIABILITIES ,Withholding tax payable - compensation,OTHER PAYABLES
+ LIABILITIES ,Deferred output VAT,OTHER PAYABLES
+ LIABILITIES ,Output VAT,OTHER PAYABLES
+ LIABILITIES ,Output VAT payable,OTHER PAYABLES
+ LIABILITIES ,Advances from Stockholders,ADVANCES FROM STOCKHOLDERS
+STOCKHOLDERS EQUITY,Capital stock,Equity
+STOCKHOLDERS EQUITY,Retained earnings,Equity
+STOCKHOLDERS EQUITY,Net Income,Equity
+STOCKHOLDERS EQUITY,Prior period adjustment,Equity
+REVENUES,Sales - Hardware,
+REVENUES,Sales - Software, 
+REVENUES,Internet Service Provider, 
+REVENUES,Vulnerability Assessment and Penetration Testing, 
+REVENUES,Technical support, 
+REVENUES,Consultancy, 
+REVENUES,Web Hosting and Management, 
+REVENUES,Installation, 
+REVENUES,Training services, 
+COST OF GOODS SOLD,CoS - Training kit,Cost of Goods Sold
+COST OF GOODS SOLD,CoS - Hardware,Cost of Goods Sold
+COST OF GOODS SOLD,CoS - Software,Cost of Goods Sold
+COST OF GOODS SOLD,CoS - ISP,Cost of Goods Sold
+COST OF GOODS SOLD,CoS - Web Support,Cost of Goods Sold
+COST OF GOODS SOLD,CoS - Technical Support,Cost of Goods Sold
+COST OF GOODS SOLD,CoS - Training ,Cost of Goods Sold
+COST OF GOODS SOLD,CoS - Consultancy,Cost of Goods Sold
+COST OF GOODS SOLD,CoS - Installation services,Cost of Goods Sold
+COST OF GOODS SOLD,CoS - VAPT,Cost of Goods Sold
+COST OF GOODS SOLD,Advertising expense,Cost of Goods Sold
+COST OF GOODS SOLD,Association dues,Cost of Goods Sold
+COST OF GOODS SOLD,Freight Costs,Cost of Goods Sold
+COST OF GOODS SOLD,CoS - Salaries and wages,Direct Labor (salary)
+COST OF GOODS SOLD,CoS - SSS Premium,Direct Labor (salary)
+COST OF GOODS SOLD,CoS - HDMF expense,Direct Labor (salary)
+COST OF GOODS SOLD,CoS - Philhealth expense,Direct Labor (salary)
+COST OF GOODS SOLD,CoS - De-minimis benefits,Direct Labor (salary)
+COST OF GOODS SOLD,CoS - Employee benefits,Direct Labor (salary)
+COST OF GOODS SOLD,CoS - 13th month pay,Direct Labor (salary)
+OPERATING EXPENSES,Salaries and wages,Salaries and wages
+OPERATING EXPENSES,SSS premium expense,Salaries and wages
+OPERATING EXPENSES,HDMF expense,Salaries and wages
+OPERATING EXPENSES,Philhealth expense,Salaries and wages
+OPERATING EXPENSES,De-minimis benefits,Salaries and wages
+OPERATING EXPENSES,Employee benefits,Salaries and wages
+OPERATING EXPENSES,Employee benefits - HMO,Salaries and wages
+OPERATING EXPENSES,13th month pay,Salaries and wages
+OPERATING EXPENSES,Dep. Exp - leasehold improvement,Depreciation expense
+OPERATING EXPENSES,Dep. Exp - furnitures and fixtures,Depreciation expense
+OPERATING EXPENSES,Dep. Exp. - Office equipment,Depreciation expense
+OPERATING EXPENSES,Dep. Exp. - Computer equipment,Depreciation expense
+OPERATING EXPENSES,Dep. Exp. - Transportation equipment,Depreciation expense
+OPERATING EXPENSES,Insurance expense,
+OPERATING EXPENSES,Miscellaneous expense,
+OPERATING EXPENSES,Office supplies expense,
+OPERATING EXPENSES,Professional fee,
+OPERATING EXPENSES,Consultancy fee,
+OPERATING EXPENSES,Directors fee,
+OPERATING EXPENSES,Janitorial expense,
+OPERATING EXPENSES,Rent expense,
+OPERATING EXPENSES,Repairs and maintenance ,
+OPERATING EXPENSES,Representation expense,
+OPERATING EXPENSES,Commission expense,
+OPERATING EXPENSES,Travel and accomodation expense,
+OPERATING EXPENSES,Taxes and licenses,
+OPERATING EXPENSES,Trainings and seminar,
+OPERATING EXPENSES,Parking and toll fees,
+OPERATING EXPENSES,Gas and Oil,
+OPERATING EXPENSES,Food and meals,
+OPERATING EXPENSES,Transportation expense,
+OPERATING EXPENSES,Communication expense,
+OPERATING EXPENSES,Light and water,
+OTHER INCOME (EXPENSE),Interest income,
+OTHER INCOME (EXPENSE),Rental Income,
+OTHER INCOME (EXPENSE),Other income,
+OTHER INCOME (EXPENSE),Unrealized foreign exchange gain (loss),
+OTHER INCOME (EXPENSE),Realized foreign exchange gain (loss),
+OTHER INCOME (EXPENSE),Bank service charge,
+OTHER INCOME (EXPENSE),Income tax expense,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,
+,,

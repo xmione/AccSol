@@ -5,54 +5,54 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using AccSol.Data;
-using AccSol.Models;
+using AccSol.EF.Data;
+using AccSol.EF.Models;
 
-namespace AccSol.Controllers
+namespace AccSol.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CoasController : ControllerBase
+    public class ClientsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public CoasController(ApplicationDbContext context)
+        public ClientsController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Coas
+        // GET: api/Clients
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Coa>>> GetCoas()
+        public async Task<ActionResult<IEnumerable<Client>>> GetClients()
         {
-            return await _context.Coas.ToListAsync();
+            return await _context.Clients.ToListAsync();
         }
 
-        // GET: api/Coas/5
+        // GET: api/Clients/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Coa>> GetCoa(int id)
+        public async Task<ActionResult<Client>> GetClient(int id)
         {
-            var coa = await _context.Coas.FindAsync(id);
+            var client = await _context.Clients.FindAsync(id);
 
-            if (coa == null)
+            if (client == null)
             {
                 return NotFound();
             }
 
-            return coa;
+            return client;
         }
 
-        // PUT: api/Coas/5
+        // PUT: api/Clients/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCoa(int id, Coa coa)
+        public async Task<IActionResult> PutClient(int id, Client client)
         {
-            if (id != coa.ID)
+            if (id != client.ID)
             {
                 return BadRequest();
             }
 
-            _context.Entry(coa).State = EntityState.Modified;
+            _context.Entry(client).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace AccSol.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CoaExists(id))
+                if (!ClientExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace AccSol.Controllers
             return NoContent();
         }
 
-        // POST: api/Coas
+        // POST: api/Clients
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Coa>> PostCoa(Coa coa)
+        public async Task<ActionResult<Client>> PostClient(Client client)
         {
-            _context.Coas.Add(coa);
+            _context.Clients.Add(client);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCoa", new { id = coa.ID }, coa);
+            return CreatedAtAction("GetClient", new { id = client.ID }, client);
         }
 
-        // DELETE: api/Coas/5
+        // DELETE: api/Clients/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCoa(int id)
+        public async Task<IActionResult> DeleteClient(int id)
         {
-            var coa = await _context.Coas.FindAsync(id);
-            if (coa == null)
+            var client = await _context.Clients.FindAsync(id);
+            if (client == null)
             {
                 return NotFound();
             }
 
-            _context.Coas.Remove(coa);
+            _context.Clients.Remove(client);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool CoaExists(int id)
+        private bool ClientExists(int id)
         {
-            return _context.Coas.Any(e => e.ID == id);
+            return _context.Clients.Any(e => e.ID == id);
         }
     }
 }

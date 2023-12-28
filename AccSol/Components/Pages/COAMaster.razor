@@ -1,9 +1,10 @@
 ﻿@page "/coa-master"
 @implements IDisposable
-@using AccSol.Models
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
-
+@inject ILogger<Index> Logger
+@using AccSol.EF.Models
+@using AccSol.EF.Services
 
 
 <PageTitle>Chart Of Accounts</PageTitle>
@@ -22,8 +23,8 @@
                 </div>
                 <div class="input-group col">
                     <input type="text" class="form-control" placeholder="Search by name"
-                           @bind="SearchString" @bind:event="oninput" @onkeyup="Filter" />
-                    @if (SearchString.Length > 0)
+                           @bind="_searchString" @bind:event="oninput" @onkeyup="Filter" />
+                    @if (_searchString.Length > 0)
                     {
                         <div class="input-group-append">
                             <button class="btn btn-danger" @onclick="ResetSearch">
@@ -34,7 +35,7 @@
                 </div>
             </div>
             <br />
-            @if (list == null)
+            @if (_list == null)
             {
                 <p><em>Loading...</em></p>
             }
@@ -45,15 +46,17 @@
                         <tr>
                             <th>ID</th>
                             <th>Category</th>
+                            <th>Sub-Category</th>
                             <th>Account Name</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var coa in list)
+                        @foreach (var coa in _list)
                         {
                             <tr>
                                 <td>@coa.ID</td>
                                 <td>@coa.Category</td>
+                                <td>@coa.SubCategory</td>
                                 <td>@coa.AccountName</td>
                                 <td>
                                     <a href='/coa-edit/@coa.ID' class="btn btn-outline-dark" role="button">
@@ -81,54 +84,60 @@
 </div>
 
 @code {
-    protected List<Coa>? list = new();
-    protected List<Coa>? searchData = new();
-    protected Coa coa = new();
-    protected string SearchString { get; set; } = string.Empty;
-    
+    protected List<Coa>? _list = new();
+    protected List<Coa>? _searchData = new();
+    protected Coa _coa = new();
+    protected string _searchString { get; set; } = string.Empty;
+
+    [Inject]
+    public ICommonService<Coa> _service { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await Get();
     }
     protected async Task Get()
     {
-        list = await Http.GetFromJsonAsync<List<Coa>>("api/Coas");
-        searchData = list;
+        Logger.LogInformation("Load called");
+
+        var list = await _service.GetAll();
+        _list = list.ToList();
+        _searchData = _list;
     }
     protected void Filter()
     {
-        if (!string.IsNullOrEmpty(SearchString))
+        if (!string.IsNullOrEmpty(_searchString))
         {
-            list = searchData?
-                .Where(x => x.AccountName.IndexOf(SearchString, StringComparison.OrdinalIgnoreCase) != -1)
+            _list = _searchData?
+                .Where(x => x.AccountName.IndexOf(_searchString, StringComparison.OrdinalIgnoreCase) != -1)
                 .ToList();
         }
         else
         {
-            list = searchData;
+            _list = _searchData.ToList();
         }
     }
     protected void DeleteConfirm(int id)
     {
-        coa = list.FirstOrDefault(x => x.ID == id);
+        _coa = _list.FirstOrDefault(x => x.ID == id);
     }
     public void ResetSearch()
     {
-        SearchString = string.Empty;
-        list = searchData;
+        _searchString = string.Empty;
+        _list = _searchData;
     }
 
-    private string? currentUrl;
+    private string? _currentUrl;
 
     protected override void OnInitialized()
     {
-        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        _currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
-        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        _currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
         StateHasChanged();
     }
 

@@ -1,4 +1,4 @@
-using AccSol.Data;
+using AccSol.EF.Data;
 using Microsoft.AspNetCore.Identity;
 
 namespace AccSol.Components.Account

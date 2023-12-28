@@ -1,6 +1,6 @@
-﻿namespace AccSol.Models
+﻿namespace AccSol.EF.Models
 {
-    public class ProjectCode
+    public class Department
     {
         public int ID { get; set; }
         public string? Code { get; set; }

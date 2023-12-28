@@ -1,6 +1,8 @@
 using AccSol.Components;
 using AccSol.Components.Account;
-using AccSol.Data;
+using AccSol.EF.Data;
+using AccSol.EF.Models;
+using AccSol.EF.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +10,12 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddCors(c =>
+{
+    c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());
+});
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
@@ -22,6 +30,11 @@ builder.Services.AddAuthentication(options =>
         options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
     })
     .AddIdentityCookies();
+builder.Services.AddHttpClient<ICommonService<Coa>, CoaService>(client =>
+{
+    var baseAddress = builder.Configuration["APIBaseURL"];
+    client.BaseAddress = new Uri(baseAddress);
+});
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -50,7 +63,7 @@ else
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 app.UseStaticFiles();
 app.UseAntiforgery();
 

@@ -1,4 +1,4 @@
-﻿namespace AccSol.Models
+﻿namespace AccSol.EF.Models
 {
     public class Employee
     {

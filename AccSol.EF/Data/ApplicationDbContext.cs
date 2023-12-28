@@ -1,9 +1,9 @@
-using AccSol.Models;
+using AccSol.EF.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
-namespace AccSol.Data
+namespace AccSol.EF.Data
 {
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
     {

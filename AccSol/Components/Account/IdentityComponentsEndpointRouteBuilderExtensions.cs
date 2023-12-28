@@ -1,6 +1,6 @@
 using AccSol.Components.Account.Pages;
 using AccSol.Components.Account.Pages.Manage;
-using AccSol.Data;
+using AccSol.EF.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
