@@ -33,7 +33,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddHttpClient<ICommonService<Coa>, CoaService>(client =>
 {
     var baseAddress = builder.Configuration["APIBaseURL"];
-    client.BaseAddress = new Uri(baseAddress);
+    client.BaseAddress = baseAddress != null? new Uri(baseAddress) : null;
 });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");

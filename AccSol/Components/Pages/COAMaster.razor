@@ -1,93 +1,182 @@
 ﻿@page "/coa-master"
-@implements IDisposable
-@inject NavigationManager NavigationManager
-@inject HttpClient Http
 @inject ILogger<Index> Logger
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+
 @using AccSol.EF.Models
 @using AccSol.EF.Services
-
 
 <PageTitle>Chart Of Accounts</PageTitle>
 
 <h1>Chart Of Accounts</h1>
 
+<h2>@currentHeading</h2>
+
+<p>
+    <label>
+        New title
+        <input @bind="newHeading" />
+    </label>
+    <button @onclick="UpdateHeading">
+        Update heading
+    </button>
+</p>
+
 <div>
-    <AuthorizeView>
-        <Authorized>
-            <div class="row">
-                <div class="col-md-6">
-                    <a href='/coa-add' class="btn btn-primary" role="button">
-                        <i class="fas fa-user-plus"></i>
-                        Add Account
-                    </a>
-                </div>
-                <div class="input-group col">
-                    <input type="text" class="form-control" placeholder="Search by name"
-                           @bind="_searchString" @bind:event="oninput" @onkeyup="Filter" />
-                    @if (_searchString.Length > 0)
-                    {
-                        <div class="input-group-append">
-                            <button class="btn btn-danger" @onclick="ResetSearch">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    }
-                </div>
-            </div>
-            <br />
-            @if (_list == null)
-            {
-                <p><em>Loading...</em></p>
-            }
-            else
-            {
-                <table class="table table-striped align-middle table-bordered">
-                    <thead class="table-success">
-                        <tr>
-                            <th>ID</th>
-                            <th>Category</th>
-                            <th>Sub-Category</th>
-                            <th>Account Name</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var coa in _list)
-                        {
-                            <tr>
-                                <td>@coa.ID</td>
-                                <td>@coa.Category</td>
-                                <td>@coa.SubCategory</td>
-                                <td>@coa.AccountName</td>
-                                <td>
-                                    <a href='/coa-edit/@coa.ID' class="btn btn-outline-dark" role="button">
-                                        Edit
-                                    </a>
-                                    <a href='/coa-delete/@coa.ID' class="btn btn-outline-danger" role="button">
-                                        Delete
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
+    <code>Search String</code>: @_searchString
+    <code>IsSearchButtonDivHidden</code>: @IsSearchButtonDivHidden
 
-                </table>
-            }
+</div>
+<p>
+    <label>
+        <input type="checkbox" @onchange="CheckChanged" />
+        @checkedMessage
+    </label>
+</p>
 
-        </Authorized>
-        <NotAuthorized>
-            <div class="nav-item px-3">
-                You are not authorized to view this page.
+<p>@count</p>
+
+<p>Current count: @currentCount</p>
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+<div>
+    <div class="row">
+        <div class="col-md-6">
+            <a href='/coa-add' class="btn btn-primary" role="button">
+                <i class="fas fa-user-plus"></i>
+                Add Account
+            </a>
+        </div>
+        <div class="input-group col">
+            <input id="searchBox" type="text" class="form-control" placeholder="Search by name"
+                   @bind="_searchString" @bind:event="oninput" @onkeyup="Filter"/>
+
+
+            <div hidden="@IsSearchButtonDivHidden" class="input-group-append">
+                <button id="searchButton" class="btn btn-primary" @onclick="ResetSearch">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
 
-        </NotAuthorized>
-    </AuthorizeView>
+        </div>
+    </div>
+    <br />
+    @if (_list == null || _list.Count() == 0)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        
+        <table class="table table-striped align-middle table-bordered">
+            <thead class="table-success">
+                <tr>
+                    <th>ID</th>
+                    <th>Category</th>
+                    <th>Sub-Category</th>
+                    <th>Account Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var coa in _list)
+                {
+                    <tr>
+                        <td>@coa.ID</td>
+                        <td>@coa.Category</td>
+                        <td>@coa.SubCategory</td>
+                        <td>@coa.AccountName</td>
+                        <td>
+                            <a href='/coa-edit/@coa.ID' class="btn btn-outline-dark" role="button">
+                                Edit
+                            </a>
+                            <a href='/coa-delete/@coa.ID' class="btn btn-outline-danger" role="button">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 </div>
 
 @code {
     protected List<Coa>? _list = new();
     protected List<Coa>? _searchData = new();
-    protected Coa _coa = new();
-    protected string _searchString { get; set; } = string.Empty;
+    protected Coa? _coa = new();
+
+    private string? _searchString = null;
+    private bool? IsSearchButtonDivHidden = true;
+
+    private int result;
+    private int currentCount = 0;
+    private void IncrementCount()
+    {
+        // Call your server-side method here
+        currentCount++;
+    }
+
+    private int count = 0;
+
+    private void KeyHandler()
+    {
+        count++;
+    }
+
+    private string currentHeading = "Initial heading";
+    private string? newHeading;
+    private string checkedMessage = "Not changed yet";
+
+    private void UpdateHeading()
+    {
+        currentHeading = $"{newHeading}!!!";
+    }
+
+    private void CheckChanged()
+    {
+        checkedMessage = $"Last changed at {DateTime.Now}";
+    }
+
+
+    private void ShowSearchButton()
+    {
+
+        if (!string.IsNullOrEmpty(_searchString))
+        {
+            //Warning: Confusing part!
+            //not null or empty, show: hidden="false"
+            IsSearchButtonDivHidden = false;
+        }
+        else
+        {
+            //null or empty, hide: hidden="true"
+            IsSearchButtonDivHidden = true;
+        }
+
+        Console.WriteLine("Input value changed: {0}", IsSearchButtonDivHidden);
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Run(() =>
+            {
+                ShowSearchButton();
+            });
+        }
+    }
+
+    private void OnSearchStringChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void testclick()
+    {
+        Console.WriteLine("clicked!");    
+    }
 
     [Inject]
     public ICommonService<Coa> _service { get; set; }
@@ -101,48 +190,64 @@
         Logger.LogInformation("Load called");
 
         var list = await _service.GetAll();
-        _list = list.ToList();
+        _list = list?.ToList();
         _searchData = _list;
-    }
-    protected void Filter()
-    {
-        if (!string.IsNullOrEmpty(_searchString))
-        {
-            _list = _searchData?
-                .Where(x => x.AccountName.IndexOf(_searchString, StringComparison.OrdinalIgnoreCase) != -1)
-                .ToList();
-        }
-        else
-        {
-            _list = _searchData.ToList();
-        }
-    }
-    protected void DeleteConfirm(int id)
-    {
-        _coa = _list.FirstOrDefault(x => x.ID == id);
-    }
-    public void ResetSearch()
-    {
-        _searchString = string.Empty;
-        _list = _searchData;
-    }
-
-    private string? _currentUrl;
-
-    protected override void OnInitialized()
-    {
-        _currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-        NavigationManager.LocationChanged += OnLocationChanged;
-    }
-
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        _currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
         StateHasChanged();
     }
 
-    public void Dispose()
+    public void Filter()
     {
-        NavigationManager.LocationChanged -= OnLocationChanged;
+        Console.WriteLine("_list: {0}", _list);
+
+        if (!string.IsNullOrEmpty(_searchString))
+        {
+            _list = _searchData?
+                .Where(x => x?.AccountName?.IndexOf(_searchString, StringComparison.OrdinalIgnoreCase) != -1)
+                .ToList();
+
+        }
+        else
+        {
+            _list = _searchData?.ToList();
+
+        }
+
+        ShowSearchButton();
+
+        Console.WriteLine("_list: {0}", _list);
+        
     }
+    protected void DeleteConfirm(int id)
+    {
+        _coa = _list?.FirstOrDefault<Coa>(c => c?.ID == id);
+    }
+    public void ResetSearch()
+    {
+        Console.WriteLine("_list: {0}", _list);
+
+        _searchString = string.Empty;
+        _list = _searchData;
+
+        Console.WriteLine("_list: {0}", _list);
+    }
+
+    // private string? _currentUrl;
+
+    // protected override void OnInitialized()
+    // {
+    //     _currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+    //     NavigationManager.LocationChanged += OnLocationChanged;
+    // }
+
+    // private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    // {
+    //     _currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+    //     StateHasChanged();
+    // }
+
+    // public void Dispose()
+    // {
+    //     NavigationManager.LocationChanged -= OnLocationChanged;
+    // }
+     
 }

@@ -89,7 +89,7 @@ namespace AccSol.EF.Services
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             var relativeUri = $"Coas/DeleteCoa/{id}";
-            var getTask = _httpClient.DeleteFromJsonAsync(relativeUri, null);
+            var getTask = _httpClient.DeleteFromJsonAsync<Coa>(relativeUri);
 
             try
             {
