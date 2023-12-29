@@ -24,19 +24,80 @@ namespace AccSol.API.Controllers
         }
 
         // GET: Coas/GetById/5
-        [HttpGet("GetCoa")]
-        public ActionResult<Coa> GetCoa([FromBody] Coa? coa)
+        [HttpGet("Get")]
+        public ActionResult<Coa?> Get([FromBody] int? id)
         {
             try
             {
-
-                if (coa != null)
+                Coa? coa = null;
+                if (id != null)
                 {
-                    coa = _repository.Coa.Get(coa, trackChanges: false);
+                    coa = _repository.Coa.Get(id, trackChanges: false);
                      
                 }
 
                 return Ok(coa);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        [HttpPost("Create")]
+        public IActionResult Create([FromBody] Coa? coa)
+        {
+            try
+            {
+                if (coa != null)
+                {
+                    _repository.Coa.Create(coa);
+                    _repository.Save();
+
+                }
+
+                return Ok(_repository.Coa);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost("Update")]
+        public IActionResult Update([FromBody] Coa? coa)
+        {
+            try
+            {
+                if (coa != null) {
+                    _repository.Coa.Update(coa);
+                    _repository.Save();
+                }
+
+                return Ok(coa);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost("Delete")]
+        public IActionResult Delete([FromBody] int? id)
+        {
+            try
+            {
+                if (id != null)
+                {
+                    var coa = _repository.Coa.Get(id, false);
+                    if (coa != null) 
+                    {
+                        _repository.Coa.Delete(coa);
+                        _repository.Save();
+                    }
+                }
+
+                return Ok(id);
             }
             catch (Exception ex)
             {

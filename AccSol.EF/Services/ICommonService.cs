@@ -5,8 +5,9 @@ namespace AccSol.EF.Services
     public interface ICommonService<T>
     {
         Task<IEnumerable<T>?> GetAll();
-        Task<T?> GetById(int id);
-        Task<T?> Save(T model);
+        Task<T?> Get(int id);
+        Task<T?> Create(T? model);
+        Task<T?> Update(T? model);
         Task Delete(int id);
     }
 }

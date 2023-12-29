@@ -32,7 +32,7 @@ namespace AccSol.EF.Services
             return list;
         }
 
-        public async Task<Coa?> GetById(int id)
+        public async Task<Coa?> Get(int id)
         {
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -57,12 +57,45 @@ namespace AccSol.EF.Services
             return coa;
         }
 
-        public async Task<Coa?> Save(Coa model)
+        public async Task<Coa?> Create(Coa? model)
         {
+            if (model == null)
+            {
+                throw new Exception("Invalid or empty model.");
+            }
             Coa? postedModel = null;
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            var getTask = _httpClient.PostAsJsonAsync("Coa/Post", model);
+            var getTask = _httpClient.PostAsJsonAsync("Coas/Create", model);
+
+            getTask.Wait();
+            HttpResponseMessage response = getTask.Result;
+            response.EnsureSuccessStatusCode();
+            if (response.IsSuccessStatusCode)
+            {
+
+                try
+                {
+                    postedModel = await response.Content.ReadFromJsonAsync<Coa>();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+
+            return postedModel;
+        }
+        public async Task<Coa?> Update(Coa? model)
+        {
+            if (model == null)
+            {
+                throw new Exception("Invalid or empty model.");
+            }
+            Coa? postedModel = null;
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            var getTask = _httpClient.PostAsJsonAsync("Coas/Update", model);
 
             getTask.Wait();
             HttpResponseMessage response = getTask.Result;
@@ -88,7 +121,7 @@ namespace AccSol.EF.Services
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            var relativeUri = $"Coas/DeleteCoa/{id}";
+            var relativeUri = $"Coas/Delete/{id}";
             var getTask = _httpClient.DeleteFromJsonAsync<Coa>(relativeUri);
 
             try
