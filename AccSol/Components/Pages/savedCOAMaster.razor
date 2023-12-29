@@ -1,4 +1,4 @@
-﻿@page "/coa-master"
+﻿@page "/saved-coa-master"
 @inject ILogger<Index> Logger
 @rendermode InteractiveServer
 
@@ -8,6 +8,36 @@
 <PageTitle>Chart Of Accounts</PageTitle>
 
 <h1>Chart Of Accounts</h1>
+
+<h2>@currentHeading</h2>
+
+<p>
+    <label>
+        New title
+        <input @bind="newHeading" />
+    </label>
+    <button @onclick="UpdateHeading">
+        Update heading
+    </button>
+</p>
+
+<div>
+    <code>Search String</code>: @_searchString
+    <code>IsSearchButtonDivHidden</code>: @IsSearchButtonDivHidden
+
+</div>
+<p>
+    <label>
+        <input type="checkbox" @onchange="CheckChanged" />
+        @checkedMessage
+    </label>
+</p>
+
+<p>@count</p>
+
+<p>Current count: @currentCount</p>
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
 <div>
     <div class="row">
         <div class="col-md-6">
@@ -20,11 +50,13 @@
             <input id="searchBox" type="text" class="form-control" placeholder="Search by name"
                    @bind="_searchString" @bind:event="oninput" @onkeyup="Filter"/>
 
+
             <div hidden="@IsSearchButtonDivHidden" class="input-group-append">
                 <button id="searchButton" class="btn btn-primary" @onclick="ResetSearch">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
+
         </div>
     </div>
     <br />
@@ -38,6 +70,7 @@
         <table class="table table-striped align-middle table-bordered">
             <thead class="table-success">
                 <tr>
+                    <th>ID</th>
                     <th>Category</th>
                     <th>Sub-Category</th>
                     <th>Account Name</th>
@@ -47,14 +80,15 @@
                 @foreach (var coa in _list)
                 {
                     <tr>
+                        <td>@coa.ID</td>
                         <td>@coa.Category</td>
                         <td>@coa.SubCategory</td>
                         <td>@coa.AccountName</td>
                         <td>
-                            <a href='/coa-edit/@coa.ID' class="btn btn-outline-dark form-control" role="button">
+                            <a href='/coa-edit/@coa.ID' class="btn btn-outline-dark" role="button">
                                 Edit
                             </a>
-                            <a href='/coa-delete/@coa.ID' class="btn btn-outline-danger form-control" role="button">
+                            <a href='/coa-delete/@coa.ID' class="btn btn-outline-danger" role="button">
                                 Delete
                             </a>
                         </td>
@@ -66,15 +100,42 @@
 </div>
 
 @code {
-    [Inject]
-    public ICommonService<Coa> _service { get; set; }
-
     protected List<Coa>? _list = new();
     protected List<Coa>? _searchData = new();
     protected Coa? _coa = new();
 
     private string? _searchString = null;
     private bool? IsSearchButtonDivHidden = true;
+
+    private int result;
+    private int currentCount = 0;
+    private void IncrementCount()
+    {
+        // Call your server-side method here
+        currentCount++;
+    }
+
+    private int count = 0;
+
+    private void KeyHandler()
+    {
+        count++;
+    }
+
+    private string currentHeading = "Initial heading";
+    private string? newHeading;
+    private string checkedMessage = "Not changed yet";
+
+    private void UpdateHeading()
+    {
+        currentHeading = $"{newHeading}!!!";
+    }
+
+    private void CheckChanged()
+    {
+        checkedMessage = $"Last changed at {DateTime.Now}";
+    }
+
 
     private void ShowSearchButton()
     {
@@ -110,6 +171,14 @@
     {
         StateHasChanged();
     }
+
+    public void testclick()
+    {
+        Console.WriteLine("clicked!");    
+    }
+
+    [Inject]
+    public ICommonService<Coa> _service { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
