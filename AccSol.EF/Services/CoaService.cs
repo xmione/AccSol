@@ -36,7 +36,7 @@ namespace AccSol.EF.Services
         {
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            var getTask = _httpClient.PostAsJsonAsync<int>("Coas/GetCoa", id);
+            var getTask = _httpClient.PostAsJsonAsync<int>("Coas/Get", id);
             Coa? coa = null;
             try
             {
@@ -121,8 +121,7 @@ namespace AccSol.EF.Services
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            var relativeUri = $"Coas/Delete/{id}";
-            var getTask = _httpClient.DeleteFromJsonAsync<Coa>(relativeUri);
+            var getTask = _httpClient.PostAsJsonAsync<int>("Coas/Delete", id);
 
             try
             {

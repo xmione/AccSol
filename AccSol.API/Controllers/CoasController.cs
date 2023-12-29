@@ -24,7 +24,7 @@ namespace AccSol.API.Controllers
         }
 
         // GET: Coas/GetById/5
-        [HttpGet("Get")]
+        [HttpPost("Get")]
         public ActionResult<Coa?> Get([FromBody] int? id)
         {
             try

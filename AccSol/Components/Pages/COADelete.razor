@@ -1,0 +1,85 @@
+﻿@page "/coa-delete/{id:int}"
+@inject ILogger<Index> Logger
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@using AccSol.EF.Models
+@using AccSol.EF.Services
+
+<PageTitle>Chart Of Accounts - Delete an Account</PageTitle>
+
+<h1>Chart Of Accounts - Delete an Account</h1>
+
+
+<h1>@Title COA Account</h1>
+<hr />
+<br />
+<div class="form-group">
+    <h4>Do you want to delete this account?</h4>
+    <table class="table">
+        <tbody>
+            <tr>
+                <td>Category</td>
+                <td>@_category</td>
+            </tr>
+            <tr>
+                <td>Sub Category</td>
+                <td>@_subCategory</td>
+            </tr>
+            <tr>
+                <td>Account Name</td>
+                <td>@_accountName</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="form-group">
+    <input type="submit" value="Delete" @onclick="(async () => await RemoveCoa(id))" class="btn btn-danger" />
+    <input type="submit" value="Cancel" @onclick="(() => Cancel())" class="btn btn-warning" />
+</div>
+@code {
+    [Parameter]
+    public int id { get; set; }
+    protected string Title = "Delete";
+    protected Coa coa = new();
+    private string? _category = null;
+    private string? _subCategory = null;
+    private string? _accountName = null;
+
+    [Inject]
+    public ICommonService<Coa> _service { get; set; }
+
+
+    protected async Task Get()
+    {
+        Logger.LogInformation("Get() was called to load Coa object data.");
+
+        coa = await _service.Get(id);
+
+        _category = coa?.Category;
+        _subCategory = coa?.SubCategory;
+        _accountName = coa?.AccountName;
+
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Get(); 
+    }
+    protected async Task RemoveCoa(int userID)
+    {
+        await _service.Delete(id);
+        ReturnToParent();
+    }
+
+    public void Cancel()
+    {
+        ReturnToParent();
+    }
+    
+    public void ReturnToParent()
+    {
+        NavigationManager.NavigateTo("/coa-master");
+    }
+}
