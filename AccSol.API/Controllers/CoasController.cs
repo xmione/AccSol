@@ -50,7 +50,7 @@ namespace AccSol.API.Controllers
             {
                 if (coa != null)
                 {
-                    _repository.Coa.Create(coa);
+                    _repository.Coa.CreateCoa(coa);
                     _repository.Save();
 
                 }
@@ -70,7 +70,7 @@ namespace AccSol.API.Controllers
             try
             {
                 if (coa != null) {
-                    _repository.Coa.Update(coa);
+                    _repository.Coa.UpdateCoa(coa);
                     _repository.Save();
                 }
 
@@ -92,7 +92,7 @@ namespace AccSol.API.Controllers
                     var coa = _repository.Coa.Get(id, false);
                     if (coa != null) 
                     {
-                        _repository.Coa.Delete(coa);
+                        _repository.Coa.DeleteCoa(coa);
                         _repository.Save();
                     }
                 }

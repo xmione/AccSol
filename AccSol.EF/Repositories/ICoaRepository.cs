@@ -6,8 +6,8 @@ namespace AccSol.EF.Repositories
     {
         IEnumerable<Coa> GetAll(bool trackChanges);
         Coa? Get(int? id, bool trackChanges);
-        void Create(Coa coa);
-        void Update(Coa coa);
-        void Delete(Coa coa) => Delete(coa);
+        void CreateCoa(Coa coa);
+        void UpdateCoa(Coa coa);
+        void DeleteCoa(Coa coa);
     }
 }

@@ -16,9 +16,8 @@ namespace AccSol.EF.Repositories
         FindByCondition(c => c.ID == id, trackChanges)
         .FirstOrDefault();
 
-        public new void Create(Coa coa) => Create(coa);
-         
-        public new void Update(Coa coa) => Update(coa);
-        public new void Delete(Coa coa) => Delete(coa);
+        public void CreateCoa(Coa coa) => Create(coa);
+        public void UpdateCoa(Coa coa) => Update(coa);
+        public void DeleteCoa(Coa coa) => Delete(coa);
     }
 }
