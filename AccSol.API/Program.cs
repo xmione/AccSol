@@ -24,11 +24,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
 
-builder.Services.AddHttpClient<ICommonService<Coa>, CoaService>(client =>
-{
-    var baseAddress = builder.Configuration["APIBaseURL"];
-    client.BaseAddress = new Uri(baseAddress);
-});
+//builder.Services.AddHttpClient<ICommonService<Coa>, CoaService>(client =>
+//{
+//    var baseAddress = builder.Configuration["APIBaseURL"];
+//    client.BaseAddress = new Uri(baseAddress);
+//});
 
 var app = builder.Build();
 

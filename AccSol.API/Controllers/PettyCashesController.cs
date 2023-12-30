@@ -6,37 +6,37 @@ namespace AccSol.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ClientsController : ControllerBase
+    public class PettyCashesController : ControllerBase
     {
         private readonly IRepositoryManager _repository;
-        public ClientsController(IRepositoryManager repository)
+        public PettyCashesController(IRepositoryManager repository)
         {
             _repository = repository;
         }
 
         
         [HttpGet("GetAll")]
-        public ActionResult<IEnumerable<Client>> GetAll()
+        public ActionResult<IEnumerable<PettyCash>> GetAll()
         {
-            var list = _repository.Client.GetAll(trackChanges: false);
+            var list = _repository.PettyCash.GetAll(trackChanges: false);
            
             return Ok(list);
         }
 
-        // GET: Clients/GetById/5
+        // GET: PettyCashes/GetById/5
         [HttpPost("Get")]
-        public ActionResult<Client?> Get([FromBody] int? id)
+        public ActionResult<PettyCash?> Get([FromBody] int? id)
         {
             try
             {
-                Client? client = null;
+                PettyCash? pettyCash = null;
                 if (id != null)
                 {
-                    client = _repository.Client.Get(id, trackChanges: false);
+                    pettyCash = _repository.PettyCash.Get(id, trackChanges: false);
                      
                 }
 
-                return Ok(client);
+                return Ok(pettyCash);
             }
             catch (Exception ex)
             {
@@ -44,18 +44,18 @@ namespace AccSol.API.Controllers
             }
         }
         [HttpPost("Create")]
-        public IActionResult Create([FromBody] Client? client)
+        public IActionResult Create([FromBody] PettyCash? pettyCash)
         {
             try
             {
-                if (client != null)
+                if (pettyCash != null)
                 {
-                    _repository.Client.CreateClient(client);
+                    _repository.PettyCash.CreatePettyCash(pettyCash);
                     _repository.Save();
 
                 }
 
-                return Ok(_repository.Client);
+                return Ok(_repository.PettyCash);
 
             }
             catch (Exception ex)
@@ -65,16 +65,16 @@ namespace AccSol.API.Controllers
         }
 
         [HttpPost("Update")]
-        public IActionResult Update([FromBody] Client? client)
+        public IActionResult Update([FromBody] PettyCash? pettyCash)
         {
             try
             {
-                if (client != null) {
-                    _repository.Client.UpdateClient(client);
+                if (pettyCash != null) {
+                    _repository.PettyCash.UpdatePettyCash(pettyCash);
                     _repository.Save();
                 }
 
-                return Ok(client);
+                return Ok(pettyCash);
             }
             catch (Exception ex)
             {
@@ -89,10 +89,10 @@ namespace AccSol.API.Controllers
             {
                 if (id != null)
                 {
-                    var client = _repository.Client.Get(id, false);
-                    if (client != null) 
+                    var pettyCash = _repository.PettyCash.Get(id, false);
+                    if (pettyCash != null) 
                     {
-                        _repository.Client.DeleteClient(client);
+                        _repository.PettyCash.DeletePettyCash(pettyCash);
                         _repository.Save();
                     }
                 }

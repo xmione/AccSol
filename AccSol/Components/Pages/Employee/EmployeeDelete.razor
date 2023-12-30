@@ -1,0 +1,82 @@
+﻿@page "/employee-delete/{id:int}"
+@inject ILogger<Index> Logger
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@using AccSol.EF.Models
+@using AccSol.EF.Services
+
+<PageTitle>@Title Employee</PageTitle>
+
+<h1>@Title Employee</h1>
+<hr />
+<br />
+<div class="form-group">
+    <h4>Do you want to delete this account?</h4>
+    <table class="table">
+        <tbody>
+            <tr>
+                <td>FirstName</td>
+                <td>@_firstName</td>
+            </tr>
+            <tr>
+                <td>Middle Name</td>
+                <td>@_middleName</td>
+            </tr>
+            <tr>
+                <td>Account Name</td>
+                <td>@_lastName</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="form-group">
+    <input type="submit" value="Delete" @onclick="(async () => await RemoveEmployee(id))" class="btn btn-danger" />
+    <input type="submit" value="Cancel" @onclick="(() => Cancel())" class="btn btn-warning" />
+</div>
+@code {
+    [Parameter]
+    public int id { get; set; }
+    protected string Title = "Delete";
+    protected Employee employee = new();
+    private string? _firstName = null;
+    private string? _middleName = null;
+    private string? _lastName = null;
+
+    [Inject]
+    public ICommonService<Employee> _service { get; set; }
+
+
+    protected async Task Get()
+    {
+        Logger.LogInformation("Get() was called to load Employee object data.");
+
+        employee = await _service.Get(id);
+
+        _firstName = employee?.FirstName;
+        _middleName = employee?.MiddleName;
+        _lastName = employee?.LastName;
+
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Get(); 
+    }
+    protected async Task RemoveEmployee(int userID)
+    {
+        await _service.Delete(id);
+        ReturnToParent();
+    }
+
+    public void Cancel()
+    {
+        ReturnToParent();
+    }
+    
+    public void ReturnToParent()
+    {
+        NavigationManager.NavigateTo("/employee-master");
+    }
+}

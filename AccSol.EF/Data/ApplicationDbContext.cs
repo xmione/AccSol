@@ -1,6 +1,5 @@
 using AccSol.EF.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 namespace AccSol.EF.Data
@@ -12,6 +11,7 @@ namespace AccSol.EF.Data
         public virtual DbSet<Employee> Employees { get; set; } = null!;
         public virtual DbSet<Client> Clients { get; set; } = null!;
         public virtual DbSet<Department> Departments { get; set; } = null!;
+        public virtual DbSet<PettyCash> PettyCashs { get; set; } = null!;
         
     }
 }

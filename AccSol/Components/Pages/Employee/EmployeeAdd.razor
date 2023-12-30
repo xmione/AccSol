@@ -1,0 +1,105 @@
+﻿@page "/employee-add"
+@page "/employee-edit/{id:int}"
+@inject ILogger<Index> Logger
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@using AccSol.EF.Models
+@using AccSol.EF.Services
+
+<PageTitle>@Title Employee</PageTitle>
+
+<h1>@Title Employee</h1>
+
+
+<h1>@Title Employee</h1>
+<hr />
+<EditForm Model="@employee" OnValidSubmit="SaveEmployee">
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label for="FirstName" class="form-label">FirstName</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="employee.FirstName" />
+        </div>
+        <ValidationMessage For="@(() => employee.FirstName)" />
+    </div>
+    <div class="mb-3">
+        <label for="MiddleName" class="form-label">MiddleName</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="employee.MiddleName" />
+        </div>
+        <ValidationMessage For="@(() => employee.MiddleName)" />
+    </div>
+    <div class="mb-3">
+        <label for="LastName" class="form-label">LastName</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="employee.LastName" />
+        </div>
+        <ValidationMessage For="@(() => employee.LastName)" />
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button class="btn btn-light" @onclick="Cancel">Cancel</button>
+    </div>
+</EditForm>
+@code {
+    [Parameter]
+    public int id { get; set; }
+    protected string Title = "Add";
+    protected Employee employee = new();
+
+    [Inject]
+    public ICommonService<Employee> _service { get; set; }
+
+
+    protected async Task Get()
+    {
+        Logger.LogInformation("Get() was called to load Employee object data.");
+
+        employee = await _service.Get(id);
+
+        StateHasChanged();
+    }
+    protected async Task Create()
+    {
+        Logger.LogInformation("Create() was called to load Employee object data.");
+
+        employee = await _service.Create(employee);
+
+        StateHasChanged();
+    }
+
+    protected async Task Update()
+    {
+        Logger.LogInformation("Update() was called to load Employee object data.");
+
+        employee = await _service.Update(employee);
+
+        StateHasChanged();
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        if (id != 0)
+        {
+            Title = "Edit";
+            await Get();
+        }
+    }
+    protected async Task SaveEmployee()
+    {
+        if (employee.ID != 0)
+        {
+            await Update();
+        }
+        else
+        {
+            await Create();
+        }
+
+        Cancel();
+    }
+    public void Cancel()
+    {
+        NavigationManager.NavigateTo("/employee-master");
+    }
+}

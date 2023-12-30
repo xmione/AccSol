@@ -1,0 +1,179 @@
+﻿@page "/petty-cash-entry"
+@inject ILogger<Index> Logger
+@rendermode InteractiveServer
+
+@using AccSol.EF.Models
+@using AccSol.EF.Services
+
+<PageTitle>Petty Cash</PageTitle>
+
+<h1>Petty Cash</h1>
+<div>
+    <div class="row">
+        <div class="col-md-6">
+            <a href='/petty-cash-add' class="btn btn-primary" role="button">
+                <i class="fas fa-user-plus"></i>
+                Add Petty Cash
+            </a>
+        </div>
+        <div class="input-group col">
+            <input id="searchBox" type="text" class="form-control" placeholder="Search by name"
+                   @bind="_searchString" @bind:event="oninput" @onkeyup="Filter"/>
+
+            <div hidden="@IsSearchButtonDivHidden" class="input-group-append">
+                <button id="searchButton" class="btn btn-primary" @onclick="ResetSearch">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <br />
+    @if (_list == null || _list.Count() == 0)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        
+        <table class="table table-striped align-middle table-bordered">
+            <thead class="table-success">
+                <tr>
+                    <th>PCF No</th>
+                    <th>Date</th>
+                    <th>Payee</th>
+                    <th>Particulars</th>
+                    <th>Client</th>
+                    <th>Project Code</th>
+                    <th>Amount</th>
+                    <th>Account</th>
+                    <th>Period From</th>
+                    <th>Period To</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pettyCash in _list)
+                {
+                    <tr>
+                        <td>@pettyCash.PCFNo</td>
+                        <td>@pettyCash.Date</td>
+                        <td>@pettyCash.Payee</td>
+                        <td>@pettyCash.Particulars</td>
+                        <td>@pettyCash.ClientId</td>
+                        <td>@pettyCash.ProjectCodeId</td>
+                        <td>@pettyCash.Amount</td>
+                        <td>@pettyCash.CoaId</td>
+                        <td>@pettyCash.PeriodFrom</td>
+                        <td>@pettyCash.PeriodTo</td>
+                        <td>
+                            <a href='/petty-cash-edit/@pettyCash.ID' class="btn btn-outline-dark form-control" role="button">
+                                Edit
+                            </a>
+                            <a href='/petty-cash-delete/@pettyCash.ID' class="btn btn-outline-danger form-control" role="button">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    [Inject]
+    public ICommonService<PettyCash> _service { get; set; }
+
+    protected List<PettyCash>? _list = new();
+    protected List<PettyCash>? _searchData = new();
+    protected PettyCash? _pettyCash = new();
+
+    private string? _searchString = null;
+    private bool? IsSearchButtonDivHidden = true;
+
+    private void ShowSearchButton()
+    {
+
+        if (!string.IsNullOrEmpty(_searchString))
+        {
+            //Warning: Confusing part!
+            //not null or empty, show: hidden="false"
+            IsSearchButtonDivHidden = false;
+        }
+        else
+        {
+            //null or empty, hide: hidden="true"
+            IsSearchButtonDivHidden = true;
+        }
+
+        Console.WriteLine("Input value changed: {0}", IsSearchButtonDivHidden);
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Run(() =>
+            {
+                ShowSearchButton();
+            });
+        }
+    }
+
+    private void OnSearchStringChanged()
+    {
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Get();
+    }
+    protected async Task Get()
+    {
+        Logger.LogInformation("Load called");
+
+        var list = await _service.GetAll();
+        _list = list?.ToList();
+        _searchData = _list;
+        StateHasChanged();
+    }
+
+    public void Filter()
+    {
+        Console.WriteLine("_list: {0}", _list);
+
+        if (!string.IsNullOrEmpty(_searchString))
+        {
+            _list = _searchData?
+                .Where(x => x?.PCFNo?.IndexOf(_searchString, StringComparison.OrdinalIgnoreCase) != -1 ||
+                x?.Particulars?.IndexOf(_searchString, StringComparison.OrdinalIgnoreCase) != -1 ||
+                x?.Payee?.IndexOf(_searchString, StringComparison.OrdinalIgnoreCase) != -1 )
+                .ToList();
+
+        }
+        else
+        {
+            _list = _searchData?.ToList();
+
+        }
+
+        ShowSearchButton();
+
+        Console.WriteLine("_list: {0}", _list);
+        
+    }
+    protected void DeleteConfirm(int id)
+    {
+        _pettyCash = _list?.FirstOrDefault<PettyCash>(c => c?.ID == id);
+    }
+    public void ResetSearch()
+    {
+        Console.WriteLine("_list: {0}", _list);
+
+        _searchString = string.Empty;
+        _list = _searchData;
+
+        Console.WriteLine("_list: {0}", _list);
+    }
+}

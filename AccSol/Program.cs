@@ -30,10 +30,27 @@ builder.Services.AddAuthentication(options =>
         options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
     })
     .AddIdentityCookies();
+var baseAddress = builder.Configuration["APIBaseURL"];
 builder.Services.AddHttpClient<ICommonService<Coa>, CoaService>(client =>
 {
-    var baseAddress = builder.Configuration["APIBaseURL"];
+    
     client.BaseAddress = baseAddress != null? new Uri(baseAddress) : null;
+});
+builder.Services.AddHttpClient<ICommonService<Client>, ClientService>(client =>
+{
+    client.BaseAddress = baseAddress != null ? new Uri(baseAddress) : null;
+});
+builder.Services.AddHttpClient<ICommonService<Employee>, EmployeeService>(client =>
+{
+    client.BaseAddress = baseAddress != null ? new Uri(baseAddress) : null;
+});
+builder.Services.AddHttpClient<ICommonService<ProjectCode>, ProjectCodeService>(client =>
+{
+    client.BaseAddress = baseAddress != null ? new Uri(baseAddress) : null;
+});
+builder.Services.AddHttpClient<ICommonService<PettyCash>, PettyCashService>(client =>
+{
+    client.BaseAddress = baseAddress != null ? new Uri(baseAddress) : null;
 });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");

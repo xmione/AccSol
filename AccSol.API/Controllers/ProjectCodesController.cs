@@ -6,37 +6,37 @@ namespace AccSol.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ClientsController : ControllerBase
+    public class ProjectCodesController : ControllerBase
     {
         private readonly IRepositoryManager _repository;
-        public ClientsController(IRepositoryManager repository)
+        public ProjectCodesController(IRepositoryManager repository)
         {
             _repository = repository;
         }
 
         
         [HttpGet("GetAll")]
-        public ActionResult<IEnumerable<Client>> GetAll()
+        public ActionResult<IEnumerable<ProjectCode>> GetAll()
         {
-            var list = _repository.Client.GetAll(trackChanges: false);
+            var list = _repository.ProjectCode.GetAll(trackChanges: false);
            
             return Ok(list);
         }
 
-        // GET: Clients/GetById/5
+        // GET: ProjectCodes/GetById/5
         [HttpPost("Get")]
-        public ActionResult<Client?> Get([FromBody] int? id)
+        public ActionResult<ProjectCode?> Get([FromBody] int? id)
         {
             try
             {
-                Client? client = null;
+                ProjectCode? projectCode = null;
                 if (id != null)
                 {
-                    client = _repository.Client.Get(id, trackChanges: false);
+                    projectCode = _repository.ProjectCode.Get(id, trackChanges: false);
                      
                 }
 
-                return Ok(client);
+                return Ok(projectCode);
             }
             catch (Exception ex)
             {
@@ -44,18 +44,18 @@ namespace AccSol.API.Controllers
             }
         }
         [HttpPost("Create")]
-        public IActionResult Create([FromBody] Client? client)
+        public IActionResult Create([FromBody] ProjectCode? projectCode)
         {
             try
             {
-                if (client != null)
+                if (projectCode != null)
                 {
-                    _repository.Client.CreateClient(client);
+                    _repository.ProjectCode.CreateProjectCode(projectCode);
                     _repository.Save();
 
                 }
 
-                return Ok(_repository.Client);
+                return Ok(_repository.ProjectCode);
 
             }
             catch (Exception ex)
@@ -65,16 +65,16 @@ namespace AccSol.API.Controllers
         }
 
         [HttpPost("Update")]
-        public IActionResult Update([FromBody] Client? client)
+        public IActionResult Update([FromBody] ProjectCode? projectCode)
         {
             try
             {
-                if (client != null) {
-                    _repository.Client.UpdateClient(client);
+                if (projectCode != null) {
+                    _repository.ProjectCode.UpdateProjectCode(projectCode);
                     _repository.Save();
                 }
 
-                return Ok(client);
+                return Ok(projectCode);
             }
             catch (Exception ex)
             {
@@ -89,10 +89,10 @@ namespace AccSol.API.Controllers
             {
                 if (id != null)
                 {
-                    var client = _repository.Client.Get(id, false);
-                    if (client != null) 
+                    var projectCode = _repository.ProjectCode.Get(id, false);
+                    if (projectCode != null) 
                     {
-                        _repository.Client.DeleteClient(client);
+                        _repository.ProjectCode.DeleteProjectCode(projectCode);
                         _repository.Save();
                     }
                 }

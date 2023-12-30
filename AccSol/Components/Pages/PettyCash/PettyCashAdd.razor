@@ -1,0 +1,189 @@
+﻿@page "/petty-cash-add"
+@page "/petty-cash-edit/{id:int}"
+@inject ILogger<Index> Logger
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@using AccSol.EF.Models
+@using AccSol.EF.Services
+
+<PageTitle>@Title Project Code</PageTitle>
+
+<h1>@Title Project Code</h1>
+<hr />
+<EditForm Model="@pettyCash" OnValidSubmit="SavePettyCash">
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label for="PCF No" class="form-label">Code</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="pettyCash.PCFNo" />
+        </div>
+        <ValidationMessage For="@(() => pettyCash.PCFNo)" />
+    </div>
+    <div class="mb-3">
+        <label for="Date" class="form-label">Date</label>
+        <div class="col-md-4">
+            <InputDate class="form-control" @bind-Value="pettyCash.Date" />
+        </div>
+        <ValidationMessage For="@(() => pettyCash.Date)" />
+    </div>
+    <div class="mb-3">
+        <label for="Payee" class="form-label">Payee</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="pettyCash.Payee" />
+        </div>
+        <ValidationMessage For="@(() => pettyCash.Payee)" />
+    </div>
+    <div class="mb-3">
+        <label for="Particulars" class="form-label">Particulars</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="pettyCash.Particulars" />
+        </div>
+        <ValidationMessage For="@(() => pettyCash.Particulars)" />
+    </div>
+    <div class="mb-3">
+        <label for="ClientId" class="form-label">Client</label>
+        <div class="col-md-4">
+            <InputSelect class="form-control" @bind-Value="pettyCash.ClientId">
+                @foreach (var client in clients)
+                {
+                    <option value="@client.ID">@client.Name</option>
+                }
+            </InputSelect>
+        </div>
+        <ValidationMessage For="@(() => pettyCash.ClientId)" />
+    </div>
+        <div class="mb-3">
+        <label for="ProjectCodeId" class="form-label">Project Code</label>
+        <div class="col-md-4">
+            <InputSelect class="form-control" @bind-Value="pettyCash.ProjectCodeId">
+                @foreach (var projectCode in projectCodes)
+                {
+                    <option value="@projectCode.ID">@projectCode.Code</option>
+                }
+            </InputSelect>
+        </div>
+        <ValidationMessage For="@(() => pettyCash.ProjectCodeId)" />
+    </div>
+    <div class="mb-3">
+        <label for="Amount" class="form-label">Amount</label>
+        <div class="col-md-4">
+            <InputNumber class="form-control" @bind-Value="pettyCash.Amount" step="0.01" />
+        </div>
+        <ValidationMessage For="@(() => pettyCash.Amount)" />
+    </div>
+    <div class="mb-3">
+        <label for="CoaId" class="form-label">Coa</label>
+        <div class="col-md-4">
+            <InputSelect class="form-control" @bind-Value="pettyCash.CoaId">
+                @foreach (var coa in coas)
+                {
+                    <option value="@coa.ID">@coa.AccountName</option>
+                }
+            </InputSelect>
+        </div>
+        <ValidationMessage For="@(() => pettyCash.ProjectCodeId)" />
+    </div>
+    <div class="mb-3">
+        <label for="PeriodFrom" class="form-label">Period From</label>
+        <div class="col-md-4">
+            <InputDate class="form-control" @bind-Value="pettyCash.PeriodFrom" />
+        </div>
+        <ValidationMessage For="@(() => pettyCash.PeriodFrom)" />
+    </div>
+    <div class="mb-3">
+        <label for="PeriodTo" class="form-label">PeriodTo</label>
+        <div class="col-md-4">
+            <InputDate class="form-control" @bind-Value="pettyCash.PeriodTo" />
+        </div>
+        <ValidationMessage For="@(() => pettyCash.PeriodTo)" />
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button class="btn btn-light" @onclick="Cancel">Cancel</button>
+    </div>
+</EditForm>
+@code {
+    [Parameter]
+    public int id { get; set; }
+    protected string Title = "Add";
+    protected PettyCash pettyCash = new();
+    protected List<Client> clients = new();
+    protected List<ProjectCode> projectCodes = new();
+    protected List<Coa> coas = new();
+
+    [Inject]
+    public ICommonService<PettyCash> _service { get; set; }
+    public ICommonService<Client> _clientService { get; set; }
+    public ICommonService<ProjectCode> _projectCodeService { get; set; }
+    public ICommonService<Coa> _coaService { get; set; }
+
+
+    protected async Task Get()
+    {
+        Logger.LogInformation("Get() was called to load PettyCash object data.");
+
+        pettyCash = await _service.Get(id);
+        var clientList = await _clientService.GetAll();
+        if (clientList != null)
+        {
+            clients = clientList.ToList();
+        }
+
+        var projectCodeList = await _projectCodeService.GetAll();
+        if (projectCodeList != null)
+        {
+            projectCodes = projectCodeList.ToList();
+        }
+        
+        var coaList = await _coaService.GetAll();
+        if (coaList != null)
+        {
+            coas = coaList.ToList();
+        }
+
+        StateHasChanged();
+    }
+    protected async Task Create()
+    {
+        Logger.LogInformation("Create() was called to load PettyCash object data.");
+
+        pettyCash = await _service.Create(pettyCash);
+
+        StateHasChanged();
+    }
+
+    protected async Task Update()
+    {
+        Logger.LogInformation("Update() was called to load PettyCash object data.");
+
+        pettyCash = await _service.Update(pettyCash);
+
+        StateHasChanged();
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        if (id != 0)
+        {
+            Title = "Edit";
+            await Get();
+        }
+    }
+    protected async Task SavePettyCash()
+    {
+        if (pettyCash.ID != 0)
+        {
+            await Update();
+        }
+        else
+        {
+            await Create();
+        }
+
+        Cancel();
+    }
+    public void Cancel()
+    {
+        NavigationManager.NavigateTo("/petty-cash-entry");
+    }
+}

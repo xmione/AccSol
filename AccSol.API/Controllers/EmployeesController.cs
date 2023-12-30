@@ -6,37 +6,37 @@ namespace AccSol.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ClientsController : ControllerBase
+    public class EmployeesController : ControllerBase
     {
         private readonly IRepositoryManager _repository;
-        public ClientsController(IRepositoryManager repository)
+        public EmployeesController(IRepositoryManager repository)
         {
             _repository = repository;
         }
 
         
         [HttpGet("GetAll")]
-        public ActionResult<IEnumerable<Client>> GetAll()
+        public ActionResult<IEnumerable<Employee>> GetAll()
         {
-            var list = _repository.Client.GetAll(trackChanges: false);
+            var list = _repository.Employee.GetAll(trackChanges: false);
            
             return Ok(list);
         }
 
-        // GET: Clients/GetById/5
+        // GET: Employees/GetById/5
         [HttpPost("Get")]
-        public ActionResult<Client?> Get([FromBody] int? id)
+        public ActionResult<Employee?> Get([FromBody] int? id)
         {
             try
             {
-                Client? client = null;
+                Employee? employee = null;
                 if (id != null)
                 {
-                    client = _repository.Client.Get(id, trackChanges: false);
+                    employee = _repository.Employee.Get(id, trackChanges: false);
                      
                 }
 
-                return Ok(client);
+                return Ok(employee);
             }
             catch (Exception ex)
             {
@@ -44,18 +44,18 @@ namespace AccSol.API.Controllers
             }
         }
         [HttpPost("Create")]
-        public IActionResult Create([FromBody] Client? client)
+        public IActionResult Create([FromBody] Employee? employee)
         {
             try
             {
-                if (client != null)
+                if (employee != null)
                 {
-                    _repository.Client.CreateClient(client);
+                    _repository.Employee.CreateEmployee(employee);
                     _repository.Save();
 
                 }
 
-                return Ok(_repository.Client);
+                return Ok(_repository.Employee);
 
             }
             catch (Exception ex)
@@ -65,16 +65,16 @@ namespace AccSol.API.Controllers
         }
 
         [HttpPost("Update")]
-        public IActionResult Update([FromBody] Client? client)
+        public IActionResult Update([FromBody] Employee? employee)
         {
             try
             {
-                if (client != null) {
-                    _repository.Client.UpdateClient(client);
+                if (employee != null) {
+                    _repository.Employee.UpdateEmployee(employee);
                     _repository.Save();
                 }
 
-                return Ok(client);
+                return Ok(employee);
             }
             catch (Exception ex)
             {
@@ -89,10 +89,10 @@ namespace AccSol.API.Controllers
             {
                 if (id != null)
                 {
-                    var client = _repository.Client.Get(id, false);
-                    if (client != null) 
+                    var employee = _repository.Employee.Get(id, false);
+                    if (employee != null) 
                     {
-                        _repository.Client.DeleteClient(client);
+                        _repository.Employee.DeleteEmployee(employee);
                         _repository.Save();
                     }
                 }

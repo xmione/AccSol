@@ -1,0 +1,159 @@
+﻿@page "/client-master"
+@inject ILogger<Index> Logger
+@rendermode InteractiveServer
+
+@using AccSol.EF.Models
+@using AccSol.EF.Services
+
+<PageTitle>Clients</PageTitle>
+
+<h1>Clients</h1>
+<div>
+    <div class="row">
+        <div class="col-md-6">
+            <a href='/client-add' class="btn btn-primary" role="button">
+                <i class="fas fa-user-plus"></i>
+                Add Client
+            </a>
+        </div>
+        <div class="input-group col">
+            <input id="searchBox" type="text" class="form-control" placeholder="Search by name"
+                   @bind="_searchString" @bind:event="oninput" @onkeyup="Filter"/>
+
+            <div hidden="@IsSearchButtonDivHidden" class="input-group-append">
+                <button id="searchButton" class="btn btn-primary" @onclick="ResetSearch">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <br />
+    @if (_list == null || _list.Count() == 0)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        
+        <table class="table table-striped align-middle table-bordered">
+            <thead class="table-success">
+                <tr>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var client in _list)
+                {
+                    <tr>
+                        <td>@client.Name</td>
+                        <td>
+                            <a href='/client-edit/@client.ID' class="btn btn-outline-dark form-control" role="button">
+                                Edit
+                            </a>
+                            <a href='/client-delete/@client.ID' class="btn btn-outline-danger form-control" role="button">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    [Inject]
+    public ICommonService<Client> _service { get; set; }
+
+    protected List<Client>? _list = new();
+    protected List<Client>? _searchData = new();
+    protected Client? _client = new();
+
+    private string? _searchString = null;
+    private bool? IsSearchButtonDivHidden = true;
+
+    private void ShowSearchButton()
+    {
+
+        if (!string.IsNullOrEmpty(_searchString))
+        {
+            //Warning: Confusing part!
+            //not null or empty, show: hidden="false"
+            IsSearchButtonDivHidden = false;
+        }
+        else
+        {
+            //null or empty, hide: hidden="true"
+            IsSearchButtonDivHidden = true;
+        }
+
+        Console.WriteLine("Input value changed: {0}", IsSearchButtonDivHidden);
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Run(() =>
+            {
+                ShowSearchButton();
+            });
+        }
+    }
+
+    private void OnSearchStringChanged()
+    {
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Get();
+    }
+    protected async Task Get()
+    {
+        Logger.LogInformation("Load called");
+
+        var list = await _service.GetAll();
+        _list = list?.ToList();
+        _searchData = _list;
+        StateHasChanged();
+    }
+
+    public void Filter()
+    {
+        Console.WriteLine("_list: {0}", _list);
+
+        if (!string.IsNullOrEmpty(_searchString))
+        {
+            _list = _searchData?
+                .Where(x => x?.Name?.IndexOf(_searchString, StringComparison.OrdinalIgnoreCase) != -1)
+                .ToList();
+
+        }
+        else
+        {
+            _list = _searchData?.ToList();
+
+        }
+
+        ShowSearchButton();
+
+        Console.WriteLine("_list: {0}", _list);
+        
+    }
+    protected void DeleteConfirm(int id)
+    {
+        _client = _list?.FirstOrDefault<Client>(c => c?.ID == id);
+    }
+    public void ResetSearch()
+    {
+        Console.WriteLine("_list: {0}", _list);
+
+        _searchString = string.Empty;
+        _list = _searchData;
+
+        Console.WriteLine("_list: {0}", _list);
+    }
+}
