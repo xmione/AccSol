@@ -122,6 +122,29 @@ namespace AccSol.EF.Migrations
                     table.PrimaryKey("PK_ProjectCodes", x => x.ID);
                 });
 
+                migrationBuilder.CreateTable(
+                name: "PettyCashes",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PCFNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Date = table.Column<DateTime>(type: "decimal(18,2)", nullable: true),
+                    Payee = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Particulars = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientId = table.Column<int>(type: "int", nullable: true),
+                    ProjectCodeId = table.Column<int>(type: "int", nullable: true),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    CoaId = table.Column<int>(type: "int", nullable: true),
+                    PeriodFrom = table.Column<DateTime>(type: "decimal(18,2)", nullable: true),
+                    PeriodTo = table.Column<DateTime>(type: "decimal(18,2)", nullable: true),
+
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PettyCashes", x => x.ID);
+                });
+
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
@@ -300,6 +323,9 @@ namespace AccSol.EF.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProjectCodes");
+
+            migrationBuilder.DropTable(
+                name: "PettyCashes");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
