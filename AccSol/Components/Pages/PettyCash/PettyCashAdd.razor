@@ -7,14 +7,14 @@
 @using AccSol.EF.Models
 @using AccSol.EF.Services
 
-<PageTitle>@Title Project Code</PageTitle>
+<PageTitle>@Title Petty Cash</PageTitle>
 
-<h1>@Title Project Code</h1>
+<h1>@Title Petty Cash</h1>
 <hr />
 <EditForm Model="@pettyCash" OnValidSubmit="SavePettyCash">
     <DataAnnotationsValidator />
     <div class="mb-3">
-        <label for="PCF No" class="form-label">Code</label>
+        <label for="PCF No" class="form-label">PCFNo</label>
         <div class="col-md-4">
             <InputText class="form-control" @bind-Value="pettyCash.PCFNo" />
         </div>
@@ -82,7 +82,7 @@
                 }
             </InputSelect>
         </div>
-        <ValidationMessage For="@(() => pettyCash.ProjectCodeId)" />
+        <ValidationMessage For="@(() => pettyCash.CoaId)" />
     </div>
     <div class="mb-3">
         <label for="PeriodFrom" class="form-label">Period From</label>
@@ -114,32 +114,46 @@
 
     [Inject]
     public ICommonService<PettyCash> _service { get; set; }
+    [Inject]
     public ICommonService<Client> _clientService { get; set; }
+    [Inject]
     public ICommonService<ProjectCode> _projectCodeService { get; set; }
+    [Inject]
     public ICommonService<Coa> _coaService { get; set; }
-
 
     protected async Task Get()
     {
         Logger.LogInformation("Get() was called to load PettyCash object data.");
+        if (id != 0)
+        {
+            Title = "Edit";
+            pettyCash = await _service.Get(id);
+        }
 
-        pettyCash = await _service.Get(id);
         var clientList = await _clientService.GetAll();
         if (clientList != null)
         {
-            clients = clientList.ToList();
+            clients = clientList.OrderBy(c => c.Name).ToList();
+            
         }
 
         var projectCodeList = await _projectCodeService.GetAll();
         if (projectCodeList != null)
         {
-            projectCodes = projectCodeList.ToList();
+            projectCodes = projectCodeList.OrderBy(p => p.Code).ToList();
         }
-        
+
         var coaList = await _coaService.GetAll();
         if (coaList != null)
         {
-            coas = coaList.ToList();
+            coas = coaList.OrderBy(c => c.AccountName).ToList();
+        }
+
+        if (pettyCash != null)
+        {
+            pettyCash.ClientId = clients[0].ID;
+            pettyCash.ProjectCodeId = projectCodes[0].ID;
+            pettyCash.CoaId = coas[0].ID;
         }
 
         StateHasChanged();
@@ -163,14 +177,13 @@
     }
     protected override async Task OnParametersSetAsync()
     {
-        if (id != 0)
-        {
-            Title = "Edit";
-            await Get();
-        }
+
+        await Get();
     }
-    protected async Task SavePettyCash()
+    
+    protected async Task SavePettyCash(EditContext context)
     {
+         
         if (pettyCash.ID != 0)
         {
             await Update();

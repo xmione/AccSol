@@ -43,9 +43,9 @@
                     <th>Payee</th>
                     <th>Particulars</th>
                     <th>Client</th>
-                    <th>Project Code</th>
+                    <th>Project</th>
                     <th>Amount</th>
-                    <th>Account</th>
+                    <th>Account Name</th>
                     <th>Period From</th>
                     <th>Period To</th>
                 </tr>
@@ -55,15 +55,15 @@
                 {
                     <tr>
                         <td>@pettyCash.PCFNo</td>
-                        <td>@pettyCash.Date</td>
+                        <td>@pettyCash.Date?.ToString("MM/dd/yyyy")</td>
                         <td>@pettyCash.Payee</td>
                         <td>@pettyCash.Particulars</td>
-                        <td>@pettyCash.ClientId</td>
-                        <td>@pettyCash.ProjectCodeId</td>
+                        <td>@GetClientName(pettyCash.ClientId.GetValueOrDefault())</td>
+                        <td>@GetProjectName(pettyCash.ProjectCodeId.GetValueOrDefault())</td>
                         <td>@pettyCash.Amount</td>
-                        <td>@pettyCash.CoaId</td>
-                        <td>@pettyCash.PeriodFrom</td>
-                        <td>@pettyCash.PeriodTo</td>
+                        <td>@GetAccountName(pettyCash.CoaId.GetValueOrDefault())</td>
+                        <td>@pettyCash.PeriodFrom?.ToString("MM/dd/yyyy")</td>
+                        <td>@pettyCash.PeriodTo?.ToString("MM/dd/yyyy")</td>
                         <td>
                             <a href='/petty-cash-edit/@pettyCash.ID' class="btn btn-outline-dark form-control" role="button">
                                 Edit
@@ -82,10 +82,23 @@
 @code {
     [Inject]
     public ICommonService<PettyCash> _service { get; set; }
+    [Inject]
+    public ICommonService<Client> _clientService { get; set; }
+    [Inject]
+    public ICommonService<ProjectCode> _projectCodeService { get; set; }
+    [Inject]
+    public ICommonService<Coa> _coaService { get; set; }
 
     protected List<PettyCash>? _list = new();
     protected List<PettyCash>? _searchData = new();
     protected PettyCash? _pettyCash = new();
+    protected List<Client> clients = new();
+    protected List<ProjectCode> projectCodes = new();
+    protected List<Coa> coas = new();
+
+    protected string? _clientName = null;
+    protected string? _projectName = null;
+    protected string? _accountName = null;
 
     private string? _searchString = null;
     private bool? IsSearchButtonDivHidden = true;
@@ -129,9 +142,43 @@
     {
         await Get();
     }
+
+    protected string? GetClientName(int clientId)
+    {
+        var client = _clientService.Get(clientId).Result;
+        return client?.Name;
+    }
+    protected string? GetProjectName(int projectId)
+    {
+        var project = _projectCodeService.Get(projectId).Result;
+        return project?.Description;
+    }
+    protected string? GetAccountName(int coaId)
+    {
+        var coa = _coaService.Get(coaId).Result;
+        return coa?.AccountName; 
+    }
     protected async Task Get()
     {
         Logger.LogInformation("Load called");
+        var clientList = await _clientService.GetAll();
+        if (clientList != null)
+        {
+            clients = clientList.OrderBy(c => c.Name).ToList();
+
+        }
+
+        var projectCodeList = await _projectCodeService.GetAll();
+        if (projectCodeList != null)
+        {
+            projectCodes = projectCodeList.OrderBy(p => p.Code).ToList();
+        }
+
+        var coaList = await _coaService.GetAll();
+        if (coaList != null)
+        {
+            coas = coaList.OrderBy(c => c.AccountName).ToList();
+        }
 
         var list = await _service.GetAll();
         _list = list?.ToList();
