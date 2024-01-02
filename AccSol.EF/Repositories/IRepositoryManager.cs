@@ -7,6 +7,7 @@
         IEmployeeRepository Employee { get; }
         IProjectCodeRepository ProjectCode { get; }
         IPettyCashRepository PettyCash { get; }
+        IJournalEntryRepository JournalEntry { get; }
         void Save();
     }
 }

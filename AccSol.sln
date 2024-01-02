@@ -5,9 +5,14 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccSol", "AccSol\AccSol.csproj", "{0A499441-9883-4C53-90EF-B6614A8C0A3E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccSol.API", "AccSol.API\AccSol.API.csproj", "{197EC20B-FCAA-4234-A628-AE5F6AB1EB75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccSol.API", "AccSol.API\AccSol.API.csproj", "{197EC20B-FCAA-4234-A628-AE5F6AB1EB75}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccSol.EF", "AccSol.EF\AccSol.EF.csproj", "{B20DEEB1-029C-48C9-9180-21813F126CC6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccSol.EF", "AccSol.EF\AccSol.EF.csproj", "{B20DEEB1-029C-48C9-9180-21813F126CC6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{741C0BC3-BD03-44BA-B6A8-59FB88CFBACD}"
+	ProjectSection(SolutionItems) = preProject
+		Steps.txt = Steps.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

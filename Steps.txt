@@ -1,0 +1,4 @@
+How to add new DataEntry or MasterFile functionality
+1. Add POCO class.
+2. Add DBContext DbSet for the POCO class.
+3. Either Add-Migration [MigrationName] and update-database -v or add directly to existing migration class.

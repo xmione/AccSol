@@ -6,6 +6,8 @@
 
 @using AccSol.EF.Models
 @using AccSol.EF.Services
+@using AccSol.Components
+@using AccSol.ViewModels
 
 <PageTitle>@Title Petty Cash</PageTitle>
 
@@ -72,8 +74,32 @@
         </div>
         <ValidationMessage For="@(() => pettyCash.Amount)" />
     </div>
-    <div class="mb-3">
-        <label for="CoaId" class="form-label">Coa</label>
+    <div class="grid" tabindex="-1">
+        <QuickGrid ItemsProvider="@itemsProvider" Virtualize="true" @ref="grid">
+            <PropertyColumn Property="@(p => p.AccountName)" Sortable="true" InitialSortDirection="SortDirection.Ascending" IsDefaultSortColumn="true" >
+                <ColumnOptions>
+                    <div class="search-box">
+                        <input type="search" autofocus @bind="nameSearch" @bind:event="oninput" placeholder="Account name..." />
+                    </div>
+                </ColumnOptions>
+            </PropertyColumn>
+        <PropertyColumn Property="@(p => p.Debit)" Sortable="true" Format="9,999,999,999,999,999.99" />
+        <PropertyColumn Property="@(p => p.Credit)" Sortable="true" Format="9,999,999,999,999,999.99" />
+          
+    </QuickGrid>
+
+    </div>
+    <div class="my-2">
+        <div class="search-box inline-block mr-4 my-1">
+            <input type="search" autofocus @bind="nameSearch" @bind:event="oninput" @bind:after="()=>grid?.RefreshDataAsync()" placeholder="Account name..." />
+        </div>
+
+        <div class="inline-block my-1">
+            Total: <strong>@numResults results found</strong>
+        </div>
+    </div>
+@*     <div class="mb-3">
+        <label for="CoaId" class="form-label">Account</label>
         <div class="col-md-4">
             <InputSelect class="form-control" @bind-Value="pettyCash.CoaId">
                 @foreach (var coa in coas)
@@ -85,19 +111,20 @@
         <ValidationMessage For="@(() => pettyCash.CoaId)" />
     </div>
     <div class="mb-3">
-        <label for="PeriodFrom" class="form-label">Period From</label>
+        <label for="Debit" class="form-label">Debit</label>
         <div class="col-md-4">
-            <InputDate class="form-control" @bind-Value="pettyCash.PeriodFrom" />
+            <InputNumber class="form-control" @bind-Value="pettyCash.Debit" step="0.01" />
         </div>
-        <ValidationMessage For="@(() => pettyCash.PeriodFrom)" />
+        <ValidationMessage For="@(() => pettyCash.Debit)" />
     </div>
     <div class="mb-3">
-        <label for="PeriodTo" class="form-label">PeriodTo</label>
+        <label for="Credit" class="form-label">Credit</label>
         <div class="col-md-4">
-            <InputDate class="form-control" @bind-Value="pettyCash.PeriodTo" />
+            <InputNumber class="form-control" @bind-Value="pettyCash.Credit" step="0.01" />
+
         </div>
-        <ValidationMessage For="@(() => pettyCash.PeriodTo)" />
-    </div>
+        <ValidationMessage For="@(() => pettyCash.Credit)" />
+    </div> *@
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Save</button>
         <button class="btn btn-light" @onclick="Cancel">Cancel</button>
@@ -108,9 +135,18 @@
     public int id { get; set; }
     protected string Title = "Add";
     protected PettyCash pettyCash = new();
+    protected JournalEntryViewModel? journalEntryViewModel;
+    protected JournalEntry journalEntry = new();
     protected List<Client> clients = new();
+    protected IQueryable<JournalEntry>? journalEntries;
+    protected IQueryable<JournalEntryViewModel>? journalEntriesVM;
     protected List<ProjectCode> projectCodes = new();
     protected List<Coa> coas = new();
+    QuickGrid<JournalEntryViewModel>? grid;
+    GridItemsProvider<JournalEntryViewModel>? itemsProvider;
+    int numResults;
+    string nameSearch;
+    GridSort<JournalEntryViewModel> accountNameSort = GridSort<JournalEntryViewModel>.ByAscending(x => x.AccountName);
 
     [Inject]
     public ICommonService<PettyCash> _service { get; set; }
@@ -120,7 +156,37 @@
     public ICommonService<ProjectCode> _projectCodeService { get; set; }
     [Inject]
     public ICommonService<Coa> _coaService { get; set; }
+    [Inject]
+    public ICommonService<JournalEntry> _journalEntryService { get; set; }
 
+    PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+    void AddJournal()
+    {
+        journalEntryViewModel = new JournalEntryViewModel();
+        journalEntriesVM?.Append(journalEntryViewModel);
+    }
+
+    void SaveJournal()
+    {
+        journalEntry = null;
+    }
+
+    void CancelAdd()
+    {
+        journalEntry = null;
+    }
+    protected async Task<string> GetAccountName(int id)
+    {
+        string accountName = string.Empty;
+
+        await Task.Run(()=>
+        {
+            accountName = coas?.FirstOrDefault(c => c.ID == id)?.AccountName;
+
+        });
+
+        return accountName;
+    }
     protected async Task Get()
     {
         Logger.LogInformation("Get() was called to load PettyCash object data.");
@@ -134,7 +200,7 @@
         if (clientList != null)
         {
             clients = clientList.OrderBy(c => c.Name).ToList();
-            
+
         }
 
         var projectCodeList = await _projectCodeService.GetAll();
@@ -149,14 +215,74 @@
             coas = coaList.OrderBy(c => c.AccountName).ToList();
         }
 
+        var journalEntryList = await _journalEntryService.GetAll();
+        if (journalEntryList != null)
+        {
+            journalEntries = journalEntryList.OrderBy(c => c.CoaId).AsQueryable();
+            journalEntriesVM = (from j in journalEntries
+                                select new JournalEntryViewModel()
+                                    {
+                                        ID = j.ID,
+                                        CoaId = j.CoaId,
+                                        AccountName = GetAccountName(j.CoaId.GetValueOrDefault()).Result,
+                                        Debit = j.Debit,
+                                        Credit = j.Credit
+                                    }
+            );
+        }
+
+
         if (pettyCash != null)
         {
             pettyCash.ClientId = clients[0].ID;
             pettyCash.ProjectCodeId = projectCodes[0].ID;
-            pettyCash.CoaId = coas[0].ID;
+            // pettyCash.CoaId = coas[0].ID;
         }
 
+        itemsProvider = async request =>
+        {
+            var result = await LoadJournalEntriesAsync(request);
+
+            // Separately display the item count
+            if (result.TotalItemCount != numResults && !request.CancellationToken.IsCancellationRequested)
+            {
+                numResults = result.TotalItemCount;
+                StateHasChanged();
+            }
+
+            return result;
+        };
+
         StateHasChanged();
+    }
+    private async ValueTask<GridItemsProviderResult<JournalEntryViewModel>> LoadJournalEntriesAsync(GridItemsProviderRequest<JournalEntryViewModel> request)
+    {
+        await Task.Run(()=>
+        {
+
+            if (journalEntries != null)
+            {
+                journalEntriesVM = (from j in journalEntries
+                                    select new JournalEntryViewModel()
+                                        {
+                                            ID = j.ID,
+                                            CoaId = j.CoaId,
+                                            AccountName = GetAccountName(j.CoaId.GetValueOrDefault()).Result,
+                                            Debit = j.Debit,
+                                            Credit = j.Credit
+                                        }
+            ).Where(j => j.AccountName == nameSearch).AsQueryable().Skip(request.StartIndex).Take(request.Count.GetValueOrDefault());
+
+                numResults = journalEntriesVM.Count();
+            }
+        });
+
+        GridItemsProviderResult<JournalEntryViewModel> result = new()
+            {
+                Items = journalEntriesVM?.ToList(),
+                TotalItemCount = int.Parse(journalEntriesVM?.Count().ToString())
+            };
+        return result;
     }
     protected async Task Create()
     {

@@ -43,18 +43,18 @@
                 <td>Amount</td>
                 <td>@_amount</td>
             </tr>
-            <tr>
+            @* <tr>
                 <td>Account</td>
                 <td>@_coa?.AccountName</td>
             </tr>
             <tr>
-                <td>Period From</td>
-                <td>@_periodFrom</td>
+                <td>Debit</td>
+                <td>@_debit</td>
             </tr>
             <tr>
-                <td>Period To</td>
-                <td>@_periodTo</td>
-            </tr>
+                <td>Credit</td>
+                <td>@_credit</td>
+            </tr> *@
         </tbody>
     </table>
 </div>
@@ -75,11 +75,9 @@
     private ProjectCode? _projectCode = null;
     private decimal? _amount = null;
     private Coa? _coa = null;
-    private DateTime? _periodFrom = null;
-    private DateTime? _periodTo = null;
     private int _clientId;
     private int _projectCodeId;
-    private int _coaId;
+    
 
     [Inject]
     public ICommonService<PettyCash> _service { get; set; }
@@ -107,13 +105,7 @@
             _projectCodeId = pettyCash.ProjectCodeId.GetValueOrDefault();
             _projectCode = await _projectCodeService.Get(_projectCodeId);
 
-            _coaId = pettyCash.CoaId.GetValueOrDefault();
-            _coa = await _coaService.Get(_coaId);
-
         }
-
-        _periodFrom = pettyCash?.PeriodFrom;
-        _periodTo = pettyCash?.PeriodTo;
 
         StateHasChanged();
     }

@@ -10,6 +10,7 @@ namespace AccSol.EF.Repositories
         private IEmployeeRepository? _employeeRepository;
         private IProjectCodeRepository? _projectCodeRepository;
         private IPettyCashRepository? _pettyCashRepository;
+        private IJournalEntryRepository? _journalEntryRepository;
         public RepositoryManager(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
@@ -62,6 +63,16 @@ namespace AccSol.EF.Repositories
                 if (_pettyCashRepository == null)
                     _pettyCashRepository = new PettyCashRepository(_dbContext);
                 return _pettyCashRepository;
+            }
+        }
+         
+        public IJournalEntryRepository JournalEntry
+        {
+            get
+            {
+                if (_journalEntryRepository == null)
+                    _journalEntryRepository = new JournalEntryRepository(_dbContext);
+                return _journalEntryRepository;
             }
         }
          

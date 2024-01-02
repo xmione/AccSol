@@ -46,8 +46,8 @@
                     <th>Project</th>
                     <th>Amount</th>
                     <th>Account Name</th>
-                    <th>Period From</th>
-                    <th>Period To</th>
+                    <th>Debit</th>
+                    <th>Credit</th>
                 </tr>
             </thead>
             <tbody>
@@ -61,9 +61,9 @@
                         <td>@GetClientName(pettyCash.ClientId.GetValueOrDefault())</td>
                         <td>@GetProjectName(pettyCash.ProjectCodeId.GetValueOrDefault())</td>
                         <td>@pettyCash.Amount</td>
-                        <td>@GetAccountName(pettyCash.CoaId.GetValueOrDefault())</td>
-                        <td>@pettyCash.PeriodFrom?.ToString("MM/dd/yyyy")</td>
-                        <td>@pettyCash.PeriodTo?.ToString("MM/dd/yyyy")</td>
+                        @* <td>@GetAccountName(pettyCash.CoaId.GetValueOrDefault())</td>
+                        <td>@pettyCash.Debit</td>
+                        <td>@pettyCash.Credit</td> *@
                         <td>
                             <a href='/petty-cash-edit/@pettyCash.ID' class="btn btn-outline-dark form-control" role="button">
                                 Edit

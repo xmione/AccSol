@@ -135,14 +135,26 @@ namespace AccSol.EF.Migrations
                     ClientId = table.Column<int>(type: "int", nullable: true),
                     ProjectCodeId = table.Column<int>(type: "int", nullable: true),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    CoaId = table.Column<int>(type: "int", nullable: true),
-                    PeriodFrom = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    PeriodTo = table.Column<DateTime>(type: "datetime2", nullable: true),
-
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PettyCashes", x => x.ID);
+                });
+            
+                migrationBuilder.CreateTable(
+                name: "JournalEntries",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PettyCashId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CoaId = table.Column<int>(type: "int", nullable: true),
+                    Debit = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Credit = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JournalEntries", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -326,6 +338,9 @@ namespace AccSol.EF.Migrations
 
             migrationBuilder.DropTable(
                 name: "PettyCashes");
+            
+            migrationBuilder.DropTable(
+                name: "JournalEntries");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

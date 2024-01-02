@@ -52,6 +52,10 @@ builder.Services.AddHttpClient<ICommonService<PettyCash>, PettyCashService>(clie
 {
     client.BaseAddress = baseAddress != null ? new Uri(baseAddress) : null;
 });
+builder.Services.AddHttpClient<ICommonService<JournalEntry>, JournalEntryService>(client =>
+{
+    client.BaseAddress = baseAddress != null ? new Uri(baseAddress) : null;
+});
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
