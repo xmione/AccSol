@@ -1,85 +1,120 @@
 ﻿@page "/petty-cash-entry"
 @inject ILogger<Index> Logger
+@inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
 @using AccSol.EF.Models
 @using AccSol.EF.Services
+@using AccSol.ViewModels
 
 <PageTitle>Petty Cash</PageTitle>
 
 <h1>Petty Cash</h1>
-<div>
+<div class="container">
     <div class="row">
-        <div class="col-md-6">
-            <a href='/petty-cash-add' class="btn btn-primary" role="button">
-                <i class="fas fa-user-plus"></i>
-                Add Petty Cash
-            </a>
-        </div>
-        <div class="input-group col">
-            <input id="searchBox" type="text" class="form-control" placeholder="Search by name"
-                   @bind="_searchString" @bind:event="oninput" @onkeyup="Filter"/>
+        <div class="col-md-12">
+            <div class="card-header">
+                <EditForm Model="@_pettyCashVM" OnValidSubmit="@AddPettyCash" >
+                    <DataAnnotationsValidator />
+                    <div class="hstack gap-2">
+                        <label for="PCF No" class="form-label">PCFNo</label>
+                        <InputText class="form-control" @bind-Value="_pettyCashVM.PCFNo" />
+                        <ValidationMessage For="@(() => _pettyCashVM.PCFNo)" />
+                        <label for="Date" class="form-label">Date</label>
+                        <InputDate class="form-control" @bind-Value="_pettyCashVM.Date" />
+                        <ValidationMessage For="@(() => _pettyCashVM.Date)" />
+                        <label for="Payee" class="form-label">Payee</label>
+                        <InputText class="form-control" @bind-Value="_pettyCashVM.Payee" />
+                        <ValidationMessage For="@(() => _pettyCashVM.Payee)" />
+                        <label for="Particulars" class="form-label">Particulars</label>
+                        <InputText class="form-control" @bind-Value="_pettyCashVM.Particulars" />
+                        <ValidationMessage For="@(() => _pettyCashVM.Particulars)" />
+                        <label for="ClientId" class="form-label">Client</label>
+                        <InputSelect class="form-control" @bind-Value="_pettyCashVM.ClientId">
+                            @foreach (var client in _clients)
+                            {
+                                <option value="@client.ID">@client.Name</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => _pettyCashVM.ClientId)" />
+                        <label for="ProjectCodeId" class="form-label">Project Code</label>
+                        <InputSelect class="form-control" @bind-Value="_pettyCashVM.ProjectCodeId">
+                            @foreach (var projectCode in _projectCodes)
+                            {
+                                <option value="@projectCode.ID">@projectCode.Code</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => _pettyCashVM.ProjectCodeId)" />
+                        <label for="Amount" class="form-label">Amount</label>
+                        <InputNumber class="form-control" @bind-Value="_pettyCashVM.Amount" step="0.01" />
+                        <ValidationMessage For="@(() => _pettyCashVM.Amount)" />
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </EditForm>
+            </div>
+            <div class="card-body">
+                <div class="grid" tabindex="-1">
+                    <QuickGrid ItemsProvider="@_itemsProvider" Virtualize="true" @ref="_grid">
+                        <PropertyColumn Property="@(p => p.PCFNo)" Sortable="true" InitialSortDirection="SortDirection.Ascending" IsDefaultSortColumn="true">
+                            <ColumnOptions>
+                                <div class="search-box">
+                                    <input type="search" autofocus @bind="_pcfNoSearch" @bind:event="oninput" placeholder="PCF No..." />
+                                </div>
+                            </ColumnOptions>
+                        </PropertyColumn>
+                        <TemplateColumn Title="PCF No" SortBy="@pcfNoSort">
+                            @context.PCFNo
+                        </TemplateColumn>
+                        <PropertyColumn Property="@(p => p.Date)" Sortable="true" Format="MM/dd/yyy" />
+                        <PropertyColumn Property="@(p => p.Payee)" Sortable="true" />
+                        <PropertyColumn Property="@(p => p.Particulars)" Sortable="true" />
+                        <PropertyColumn Property="@(p => p.ClientName)" Sortable="true" />
+                        <PropertyColumn Property="@(p => p.ProjectName)" Sortable="true" />
+                        <PropertyColumn Property="@(p => p.Amount)" Sortable="true" Format="9,999,999,999,999,999.99" />
+                        <TemplateColumn Title="Action">
+                            <button @onclck="@(()=>Edit(context))" class="btn btn-info">Edit</button>
+                            <button @onclck="@(()=>Delete(context))" class="btn btn-danger">Delete</button>
+                        </TemplateColumn>
+                    </QuickGrid>
 
-            <div hidden="@IsSearchButtonDivHidden" class="input-group-append">
-                <button id="searchButton" class="btn btn-primary" @onclick="ResetSearch">
-                    <i class="fas fa-times"></i>
-                </button>
+                </div>
+                <div class="my-2">
+                    <div class="search-box inline-block mr-4 my-1">
+                        <input type="search" autofocus @bind="_pcfNoSearch" @bind:event="oninput" @bind:after="()=>_grid?.RefreshDataAsync()" placeholder="PCF No..." />
+                    </div>
+
+                    <div class="inline-block my-1">
+                        Total: <strong>@_numResults results found</strong>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <br />
-    @if (_list == null || _list.Count() == 0)
-    {
-        <p><em>Loading...</em></p>
-    }
-    else
-    {
-        
-        <table class="table table-striped align-middle table-bordered">
-            <thead class="table-success">
-                <tr>
-                    <th>PCF No</th>
-                    <th>Date</th>
-                    <th>Payee</th>
-                    <th>Particulars</th>
-                    <th>Client</th>
-                    <th>Project</th>
-                    <th>Amount</th>
-                    <th>Account Name</th>
-                    <th>Debit</th>
-                    <th>Credit</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var pettyCash in _list)
-                {
-                    <tr>
-                        <td>@pettyCash.PCFNo</td>
-                        <td>@pettyCash.Date?.ToString("MM/dd/yyyy")</td>
-                        <td>@pettyCash.Payee</td>
-                        <td>@pettyCash.Particulars</td>
-                        <td>@GetClientName(pettyCash.ClientId.GetValueOrDefault())</td>
-                        <td>@GetProjectName(pettyCash.ProjectCodeId.GetValueOrDefault())</td>
-                        <td>@pettyCash.Amount</td>
-                        @* <td>@GetAccountName(pettyCash.CoaId.GetValueOrDefault())</td>
-                        <td>@pettyCash.Debit</td>
-                        <td>@pettyCash.Credit</td> *@
-                        <td>
-                            <a href='/petty-cash-edit/@pettyCash.ID' class="btn btn-outline-dark form-control" role="button">
-                                Edit
-                            </a>
-                            <a href='/petty-cash-delete/@pettyCash.ID' class="btn btn-outline-danger form-control" role="button">
-                                Delete
-                            </a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
 </div>
 
+
+
 @code {
+
+    private PettyCash _pettyCash = new();
+    private List<PettyCash>? _pettyCashList = new();
+    private PettyCashVM _pettyCashVM = new();
+    private List<PettyCashVM> _pettyCashVMList = new();
+    private List<Client> _clients = new();
+    private List<ProjectCode> _projectCodes = new();
+    private List<Coa> _coas = new();
+    private IQueryable<PettyCash>? _pettyCashQList;
+    private IQueryable<PettyCashVM>? _pettyCashVMQList;
+    private string? _clientName = null;
+    private string? _projectName = null;
+    private string? _accountName = null;
+
+    private QuickGrid<PettyCashVM>? _grid;
+    private GridItemsProvider<PettyCashVM>? _itemsProvider;
+    private int _numResults;
+    private string _pcfNoSearch;
+    private GridSort<PettyCashVM> pcfNoSort = GridSort<PettyCashVM>.ByAscending(x => x.PCFNo);
+
     [Inject]
     public ICommonService<PettyCash> _service { get; set; }
     [Inject]
@@ -89,138 +124,162 @@
     [Inject]
     public ICommonService<Coa> _coaService { get; set; }
 
-    protected List<PettyCash>? _list = new();
-    protected List<PettyCash>? _searchData = new();
-    protected PettyCash? _pettyCash = new();
-    protected List<Client> clients = new();
-    protected List<ProjectCode> projectCodes = new();
-    protected List<Coa> coas = new();
-
-    protected string? _clientName = null;
-    protected string? _projectName = null;
-    protected string? _accountName = null;
-
-    private string? _searchString = null;
-    private bool? IsSearchButtonDivHidden = true;
-
-    private void ShowSearchButton()
-    {
-
-        if (!string.IsNullOrEmpty(_searchString))
-        {
-            //Warning: Confusing part!
-            //not null or empty, show: hidden="false"
-            IsSearchButtonDivHidden = false;
-        }
-        else
-        {
-            //null or empty, hide: hidden="true"
-            IsSearchButtonDivHidden = true;
-        }
-
-        Console.WriteLine("Input value changed: {0}", IsSearchButtonDivHidden);
-
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await Task.Run(() =>
-            {
-                ShowSearchButton();
-            });
-        }
-    }
-
-    private void OnSearchStringChanged()
-    {
-        StateHasChanged();
-    }
 
     protected override async Task OnInitializedAsync()
     {
-        await Get();
+        await GetInitialData();
+        await GetItemsProvider();
     }
 
-    protected string? GetClientName(int clientId)
+    private async Task GetInitialData()
     {
-        var client = _clientService.Get(clientId).Result;
-        return client?.Name;
+        Logger.LogInformation("Get() was called to load PettyCash data.");
+
+        await LoadClients();
+        await LoadProjectCodes();
+        await Task.Run(async ()=>
+        {
+            _pettyCashVM.ClientId = _clients[0].ID;
+            _pettyCashVM.ClientName = await GetClientName(_pettyCashVM.ClientId.GetValueOrDefault());
+            _pettyCashVM.ProjectCodeId = _projectCodes[0].ID;
+            _pettyCashVM.ProjectName = await GetProjectName(_pettyCashVM.ProjectCodeId.GetValueOrDefault());
+        });
+
+        // for the QuickGrid
+        await LoadPettyCashList();
     }
-    protected string? GetProjectName(int projectId)
+
+    private async Task LoadClients()
     {
-        var project = _projectCodeService.Get(projectId).Result;
-        return project?.Description;
+        var clientList = await _clientService.GetAll();
+        _clients = clientList?.OrderBy(c => c.Name).ToList() ?? new List<Client>();
     }
-    protected string? GetAccountName(int coaId)
+
+    private async Task LoadProjectCodes()
+    {
+        var projectCodeList = await _projectCodeService.GetAll();
+        _projectCodes = projectCodeList?.OrderBy(p => p.Code).ToList() ?? new List<ProjectCode>();
+    }
+
+    private async Task LoadPettyCashList()
+    {
+        _pettyCashList = (await _service.GetAll()).OrderBy(c => c.Date).ToList();
+        _pettyCashVMQList = _pettyCashList
+            .Select(p => new PettyCashVM
+                {
+                    ID = p.ID,
+                    PCFNo = p.PCFNo,
+                    Date = p.Date,
+                    Payee = p.Payee,
+                    Particulars = p.Particulars,
+                    ClientId = p.ClientId,
+                    ProjectCodeId = p.ProjectCodeId,
+                    Amount = p.Amount,
+                    ClientName = GetClientName(p.ClientId)?.Result,
+                    ProjectName = GetProjectName(p.ProjectCodeId)?.Result,
+                })
+            .Where(p => p.PCFNo == _pcfNoSearch)
+            .AsQueryable();
+    }
+
+    private void AddPettyCash()
+    {
+
+        _pettyCashVMList.Add(_pettyCashVM);
+
+
+        GetItemsProvider().Wait();
+    }
+
+    private void Edit(PettyCashVM model)
+    {
+        var foundModel = _pettyCashVMList?.FirstOrDefault(j => j.ID == model.ID);
+
+        if (foundModel != null)
+        {
+            foundModel.PCFNo = model.PCFNo;
+            foundModel.Date = model.Date;
+            foundModel.Payee = model.Payee;
+            foundModel.Payee = model.Payee;
+            foundModel.Particulars = model.Particulars;
+            foundModel.ClientId = model.ClientId;
+            foundModel.ProjectCodeId = model.ProjectCodeId;
+            foundModel.Amount = model.Amount;
+            foundModel.Particulars = model.Particulars;
+
+            //GetItemsProvider().Wait();
+        }
+    }
+
+    private void Delete(PettyCashVM model)
+    {
+        _pettyCashVMList?.Remove(model);
+
+        //GetItemsProvider().Wait();
+    }
+
+    private async Task<string>? GetClientName(int? id)
+    {
+        string? name = string.Empty;
+
+        await Task.Run(() =>
+        {
+            name = _clients?.FirstOrDefault(c => c.ID == id)?.Name;
+        });
+
+        return name;
+    }
+
+    private async Task<string>? GetProjectName(int? id)
+    {
+        string? name = string.Empty;
+
+        await Task.Run(() =>
+        {
+            name = _projectCodes?.FirstOrDefault(c => c.ID == id)?.Description;
+        });
+
+        return name;
+    }
+
+    private string? GetAccountName(int coaId)
     {
         var coa = _coaService.Get(coaId).Result;
-        return coa?.AccountName; 
+        return coa?.AccountName;
     }
-    protected async Task Get()
+    
+    private async Task GetItemsProvider()
     {
-        Logger.LogInformation("Load called");
-        var clientList = await _clientService.GetAll();
-        if (clientList != null)
+        
+        _itemsProvider = async request =>
         {
-            clients = clientList.OrderBy(c => c.Name).ToList();
+            var result = await LoadPettyCashListAsync(request);
 
-        }
+            if (result.TotalItemCount != _numResults && !request.CancellationToken.IsCancellationRequested)
+            {
+                _numResults = result.TotalItemCount;
+            }
 
-        var projectCodeList = await _projectCodeService.GetAll();
-        if (projectCodeList != null)
-        {
-            projectCodes = projectCodeList.OrderBy(p => p.Code).ToList();
-        }
-
-        var coaList = await _coaService.GetAll();
-        if (coaList != null)
-        {
-            coas = coaList.OrderBy(c => c.AccountName).ToList();
-        }
-
-        var list = await _service.GetAll();
-        _list = list?.ToList();
-        _searchData = _list;
-        StateHasChanged();
-    }
-
-    public void Filter()
-    {
-        Console.WriteLine("_list: {0}", _list);
-
-        if (!string.IsNullOrEmpty(_searchString))
-        {
-            _list = _searchData?
-                .Where(x => x?.PCFNo?.IndexOf(_searchString, StringComparison.OrdinalIgnoreCase) != -1 ||
-                x?.Particulars?.IndexOf(_searchString, StringComparison.OrdinalIgnoreCase) != -1 ||
-                x?.Payee?.IndexOf(_searchString, StringComparison.OrdinalIgnoreCase) != -1 )
-                .ToList();
-
-        }
-        else
-        {
-            _list = _searchData?.ToList();
-
-        }
-
-        ShowSearchButton();
-
-        Console.WriteLine("_list: {0}", _list);
+            return result;
+        };
         
     }
-    protected void DeleteConfirm(int id)
-    {
-        _pettyCash = _list?.FirstOrDefault<PettyCash>(c => c?.ID == id);
-    }
-    public void ResetSearch()
-    {
-        Console.WriteLine("_list: {0}", _list);
 
-        _searchString = string.Empty;
-        _list = _searchData;
+    private async ValueTask<GridItemsProviderResult<PettyCashVM>> LoadPettyCashListAsync(GridItemsProviderRequest<PettyCashVM> request)
+    {
+        await Task.Run(() =>
+        {
+            _pettyCashVMList = _pettyCashVMList?.Skip(request.StartIndex).Take(request.Count.GetValueOrDefault()).ToList();
+            var count = _pettyCashVMList?.Count();
+            _numResults = count.GetValueOrDefault();
+        });
 
-        Console.WriteLine("_list: {0}", _list);
+        GridItemsProviderResult<PettyCashVM> result = new()
+            {
+                Items = _pettyCashVMList,
+                TotalItemCount = _numResults
+            };
+
+        return result;
     }
 }
