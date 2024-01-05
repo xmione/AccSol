@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AccSol.EF.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231228110721_AddInitialModelClasses")]
-    partial class AddInitialModelClasses
+    [Migration("20240105031633_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace AccSol.EF.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("AccSol.Data.ApplicationUser", b =>
+            modelBuilder.Entity("AccSol.EF.Data.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -90,7 +90,7 @@ namespace AccSol.EF.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("AccSol.Models.Client", b =>
+            modelBuilder.Entity("AccSol.EF.Models.Client", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -106,7 +106,7 @@ namespace AccSol.EF.Migrations
                     b.ToTable("Clients");
                 });
 
-            modelBuilder.Entity("AccSol.Models.Coa", b =>
+            modelBuilder.Entity("AccSol.EF.Models.Coa", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -128,7 +128,7 @@ namespace AccSol.EF.Migrations
                     b.ToTable("Coas");
                 });
 
-            modelBuilder.Entity("AccSol.Models.Department", b =>
+            modelBuilder.Entity("AccSol.EF.Models.Department", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -147,7 +147,7 @@ namespace AccSol.EF.Migrations
                     b.ToTable("Departments");
                 });
 
-            modelBuilder.Entity("AccSol.Models.Employee", b =>
+            modelBuilder.Entity("AccSol.EF.Models.Employee", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -172,7 +172,72 @@ namespace AccSol.EF.Migrations
                     b.ToTable("Employees");
                 });
 
-            modelBuilder.Entity("AccSol.Models.ProjectCode", b =>
+            modelBuilder.Entity("AccSol.EF.Models.JournalEntry", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<int?>("CoaId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("Credit")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("Debit")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("PettyCashId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("JournalEntries");
+                });
+
+            modelBuilder.Entity("AccSol.EF.Models.PettyCash", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<decimal?>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("ClientId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PCFNo")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Particulars")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Payee")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProjectCodeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("PCFNo")
+                        .IsUnique()
+                        .HasDatabaseName("IX_PettyCashes_PCFNo");
+
+                    b.ToTable("PettyCashes");
+                });
+
+            modelBuilder.Entity("AccSol.EF.Models.ProjectCode", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -335,7 +400,7 @@ namespace AccSol.EF.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("AccSol.Data.ApplicationUser", null)
+                    b.HasOne("AccSol.EF.Data.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -344,7 +409,7 @@ namespace AccSol.EF.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("AccSol.Data.ApplicationUser", null)
+                    b.HasOne("AccSol.EF.Data.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -359,7 +424,7 @@ namespace AccSol.EF.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AccSol.Data.ApplicationUser", null)
+                    b.HasOne("AccSol.EF.Data.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -368,7 +433,7 @@ namespace AccSol.EF.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("AccSol.Data.ApplicationUser", null)
+                    b.HasOne("AccSol.EF.Data.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

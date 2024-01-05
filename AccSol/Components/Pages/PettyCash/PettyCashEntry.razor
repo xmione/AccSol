@@ -14,45 +14,49 @@
     <div class="row">
         <div class="col-md-12">
             <div class="card-header">
-                <EditForm Model="@_pettyCashVM" OnValidSubmit="@AddPettyCash" >
+                <EditForm Model="@_pettyCashVM" OnValidSubmit="@SavePettyCash" Enhance>
                     <DataAnnotationsValidator />
+                    <ValidationSummary />
                     <div class="hstack gap-2">
-                        <label for="PCF No" class="form-label">PCFNo</label>
-                        <InputText class="form-control" @bind-Value="_pettyCashVM.PCFNo" />
-                        <ValidationMessage For="@(() => _pettyCashVM.PCFNo)" />
-                        <label for="Date" class="form-label">Date</label>
-                        <InputDate class="form-control" @bind-Value="_pettyCashVM.Date" />
-                        <ValidationMessage For="@(() => _pettyCashVM.Date)" />
-                        <label for="Payee" class="form-label">Payee</label>
-                        <InputText class="form-control" @bind-Value="_pettyCashVM.Payee" />
-                        <ValidationMessage For="@(() => _pettyCashVM.Payee)" />
-                        <label for="Particulars" class="form-label">Particulars</label>
-                        <InputText class="form-control" @bind-Value="_pettyCashVM.Particulars" />
-                        <ValidationMessage For="@(() => _pettyCashVM.Particulars)" />
-                        <label for="ClientId" class="form-label">Client</label>
-                        <InputSelect class="form-control" @bind-Value="_pettyCashVM.ClientId">
+                        <label for="pcfNo" class="form-label">PCFNo</label>
+                        <InputText id="pcfNo" class="form-control" @bind-Value="_pettyCashVM.PCFNo" />
+                        <label for="date" class="form-label">Date</label>
+                        <InputDate id="date" class="form-control" @bind-Value="_pettyCashVM.Date" />
+                        <label for="payee" class="form-label">Payee</label>
+                        <InputText id="payee" class="form-control" @bind-Value="_pettyCashVM.Payee" />
+                        <label for="particulars" class="form-label">Particulars</label>
+                        <InputText id="particulars" class="form-control" @bind-Value="_pettyCashVM.Particulars" />
+                        <label for="client" class="form-label">Client</label>
+                        <InputSelect id="client" class="form-control" @bind-Value="_pettyCashVM.ClientId">
                             @foreach (var client in _clients)
                             {
                                 <option value="@client.ID">@client.Name</option>
                             }
                         </InputSelect>
-                        <ValidationMessage For="@(() => _pettyCashVM.ClientId)" />
-                        <label for="ProjectCodeId" class="form-label">Project Code</label>
-                        <InputSelect class="form-control" @bind-Value="_pettyCashVM.ProjectCodeId">
+                        <label for="projectCode" class="form-label">Project Code</label>
+                        <InputSelect id="projectCode" class="form-control" @bind-Value="_pettyCashVM.ProjectCodeId">
                             @foreach (var projectCode in _projectCodes)
                             {
                                 <option value="@projectCode.ID">@projectCode.Code</option>
                             }
                         </InputSelect>
-                        <ValidationMessage For="@(() => _pettyCashVM.ProjectCodeId)" />
-                        <label for="Amount" class="form-label">Amount</label>
-                        <InputNumber class="form-control" @bind-Value="_pettyCashVM.Amount" step="0.01" />
-                        <ValidationMessage For="@(() => _pettyCashVM.Amount)" />
+                        <label for="amount" class="form-label">Amount</label>
+                        <InputNumber id="amount" class="form-control" @bind-Value="_pettyCashVM.Amount" step="0.01" />
                         <button type="submit" class="btn btn-primary">Save</button>
                     </div>
                 </EditForm>
             </div>
             <div class="card-body">
+                <div class="page-size-chooser">
+                    Items per page:
+                    <select id="itemsPerPage" @bind="@_pagination.ItemsPerPage">
+                        <option>5</option>
+                        <option>10</option>
+                        <option>20</option>
+                        <option>50</option>
+                    </select>
+                </div>
+                
                 <div class="grid" tabindex="-1">
                     <QuickGrid ItemsProvider="@_itemsProvider" Virtualize="true" @ref="_grid">
                         <PropertyColumn Property="@(p => p.PCFNo)" Sortable="true" InitialSortDirection="SortDirection.Ascending" IsDefaultSortColumn="true">
@@ -78,9 +82,10 @@
                     </QuickGrid>
 
                 </div>
+                <Paginator State="@_pagination" />
                 <div class="my-2">
                     <div class="search-box inline-block mr-4 my-1">
-                        <input type="search" autofocus @bind="_pcfNoSearch" @bind:event="oninput" @bind:after="()=>_grid?.RefreshDataAsync()" placeholder="PCF No..." />
+                        <input id="search" type="search" autofocus @bind="_pcfNoSearch" @bind:event="oninput" @bind:after="()=>_grid?.RefreshDataAsync()" placeholder="PCF No..." />
                     </div>
 
                     <div class="inline-block my-1">
@@ -91,8 +96,6 @@
         </div>
     </div>
 </div>
-
-
 
 @code {
 
@@ -114,6 +117,7 @@
     private int _numResults;
     private string _pcfNoSearch;
     private GridSort<PettyCashVM> pcfNoSort = GridSort<PettyCashVM>.ByAscending(x => x.PCFNo);
+    private PaginationState _pagination = new PaginationState { ItemsPerPage = 10 };
 
     [Inject]
     public ICommonService<PettyCash> _service { get; set; }
@@ -178,16 +182,32 @@
                     ClientName = GetClientName(p.ClientId)?.Result,
                     ProjectName = GetProjectName(p.ProjectCodeId)?.Result,
                 })
-            .Where(p => p.PCFNo == _pcfNoSearch)
             .AsQueryable();
+
+        _pettyCashVM = new(_pettyCashVMQList);
     }
 
-    private void AddPettyCash()
+    private void SavePettyCash()
     {
+        
+        _pettyCash.ID = _pettyCashVM.ID;
+        _pettyCash.PCFNo = _pettyCashVM.PCFNo;
+        _pettyCash.Date = _pettyCashVM.Date;
+        _pettyCash.Payee = _pettyCashVM.Payee;
+        _pettyCash.Particulars = _pettyCashVM.Particulars;
+        _pettyCash.ClientId = _pettyCashVM.ClientId;
+        _pettyCash.ProjectCodeId = _pettyCashVM.ProjectCodeId;
+        _pettyCash.Amount = _pettyCashVM.Amount;
 
-        _pettyCashVMList.Add(_pettyCashVM);
-
-
+        if (_pettyCash.ID == 0)
+        {
+           _pettyCash = _service.Create(_pettyCash).Result;
+        }
+        else
+        {
+            _pettyCash = _service.Update(_pettyCash).Result;
+        }
+        
         GetItemsProvider().Wait();
     }
 
@@ -269,7 +289,7 @@
     {
         await Task.Run(() =>
         {
-            _pettyCashVMList = _pettyCashVMList?.Skip(request.StartIndex).Take(request.Count.GetValueOrDefault()).ToList();
+            _pettyCashVMList = _pettyCashVMQList?.Skip(request.StartIndex).Take(_pagination.ItemsPerPage).ToList();
             var count = _pettyCashVMList?.Count();
             _numResults = count.GetValueOrDefault();
         });

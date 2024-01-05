@@ -43,8 +43,9 @@ namespace AccSol.API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
         [HttpPost("Create")]
-        public IActionResult Create([FromBody] PettyCash? pettyCash)
+        public ActionResult<PettyCash?> Create([FromBody] PettyCash? pettyCash)
         {
             try
             {
@@ -55,7 +56,7 @@ namespace AccSol.API.Controllers
 
                 }
 
-                return Ok(_repository.PettyCash);
+                return Ok(pettyCash);
 
             }
             catch (Exception ex)

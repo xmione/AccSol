@@ -2,3 +2,9 @@ How to add new DataEntry or MasterFile functionality
 1. Add POCO class.
 2. Add DBContext DbSet for the POCO class.
 3. Either Add-Migration [MigrationName] and update-database -v or add directly to existing migration class.
+
+How to specify migration and startup project when running Add-Migrations
+1. Add-Migration AddUniqueConstraintToPCFNo -StartupProject AccSol.API -Project AccSol.EF
+
+How to remove it (the current migration).
+1. Remove-Migration -StartupProject AccSol.API -Project AccSol.EF

@@ -13,6 +13,23 @@ namespace AccSol.EF.Data
         public virtual DbSet<Department> Departments { get; set; } = null!;
         public virtual DbSet<PettyCash> PettyCashes { get; set; } = null!;
         public virtual DbSet<JournalEntry> JournalEntries { get; set; } = null!;
+       
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Configure index for unique constraint on PCFNo with appropriate column type
+            modelBuilder.Entity<PettyCash>()
+                .Property(p => p.PCFNo)
+                .HasMaxLength(255) // Adjust the maximum length accordingly
+                .IsRequired(); // Ensure the column is not nullable
 
+            modelBuilder.Entity<PettyCash>()
+                .HasIndex(p => p.PCFNo)
+                .IsUnique()
+                .HasDatabaseName("IX_PettyCashes_PCFNo"); // Specify the index name
+
+            // Other configurations...
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }
