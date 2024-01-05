@@ -17,32 +17,48 @@
                 <EditForm Model="@_pettyCashVM" OnValidSubmit="@SavePettyCash" Enhance>
                     <DataAnnotationsValidator />
                     <ValidationSummary />
-                    <div class="hstack gap-2">
-                        <label for="pcfNo" class="form-label">PCFNo</label>
-                        <InputText id="pcfNo" class="form-control" @bind-Value="_pettyCashVM.PCFNo" />
-                        <label for="date" class="form-label">Date</label>
-                        <InputDate id="date" class="form-control" @bind-Value="_pettyCashVM.Date" />
-                        <label for="payee" class="form-label">Payee</label>
-                        <InputText id="payee" class="form-control" @bind-Value="_pettyCashVM.Payee" />
-                        <label for="particulars" class="form-label">Particulars</label>
-                        <InputText id="particulars" class="form-control" @bind-Value="_pettyCashVM.Particulars" />
-                        <label for="client" class="form-label">Client</label>
-                        <InputSelect id="client" class="form-control" @bind-Value="_pettyCashVM.ClientId">
-                            @foreach (var client in _clients)
-                            {
-                                <option value="@client.ID">@client.Name</option>
-                            }
-                        </InputSelect>
-                        <label for="projectCode" class="form-label">Project Code</label>
-                        <InputSelect id="projectCode" class="form-control" @bind-Value="_pettyCashVM.ProjectCodeId">
-                            @foreach (var projectCode in _projectCodes)
-                            {
-                                <option value="@projectCode.ID">@projectCode.Code</option>
-                            }
-                        </InputSelect>
-                        <label for="amount" class="form-label">Amount</label>
-                        <InputNumber id="amount" class="form-control" @bind-Value="_pettyCashVM.Amount" step="0.01" />
-                        <button type="submit" class="btn btn-primary">Save</button>
+                    <div class="d-flex flex-row" style="overflow-x: auto;">
+                        <div class="form-group mx-2">
+                            <label for="pcfNo" class="form-label">PCFNo</label>
+                            <InputText id="pcfNo" class="form-control" @bind-Value="_pettyCashVM.PCFNo" />
+                        </div>
+                        <div class="form-group mx-2">
+                            <label for="date" class="form-label">Date</label>
+                            <InputDate id="date" class="form-control" @bind-Value="_pettyCashVM.Date" />
+                        </div>
+                        <div class="form-group mx-2">
+                            <label for="payee" class="form-label">Payee</label>
+                            <InputText id="payee" class="form-control" @bind-Value="_pettyCashVM.Payee" />
+                        </div>
+                        <div class="form-group mx-2">
+                            <label for="particulars" class="form-label">Particulars</label>
+                            <InputText id="particulars" class="form-control" @bind-Value="_pettyCashVM.Particulars" />
+                        </div>
+                        <div class="form-group mx-2">
+                            <label for="client" class="form-label">Client</label>
+                            <InputSelect id="client" class="form-control" @bind-Value="_pettyCashVM.ClientId">
+                                @foreach (var client in _clients)
+                                {
+                                    <option value="@client.ID">@client.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-group mx-2">
+                            <label for="projectCode" class="form-label" style="white-space: nowrap;">Project Code</label>
+                            <InputSelect id="projectCode" class="form-control" @bind-Value="_pettyCashVM.ProjectCodeId">
+                                @foreach (var projectCode in _projectCodes)
+                                {
+                                    <option value="@projectCode.ID">@projectCode.Code</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-group mx-2">
+                            <label for="amount" class="form-label">Amount</label>
+                            <InputNumber id="amount" class="form-control" @bind-Value="_pettyCashVM.Amount" step="0.01" />
+                        </div>
+                        <div class="form-group mx-2 d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
                     </div>
                 </EditForm>
             </div>
@@ -184,7 +200,8 @@
                 })
             .AsQueryable();
 
-        _pettyCashVM = new(_pettyCashVMQList);
+        
+        _pettyCashVM = new(_pettyCashList);
     }
 
     private void SavePettyCash()

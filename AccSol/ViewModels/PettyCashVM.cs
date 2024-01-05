@@ -8,15 +8,15 @@ namespace AccSol.ViewModels
     {
         public string? ClientName { get; set; }
         public string? ProjectName { get; set; }
-        private IQueryable<PettyCash> _pettyCashQList;
+        private List<PettyCash> _pettyCashList;
         
         public PettyCashVM()
         {
             
         }
-        public PettyCashVM(IQueryable<PettyCash> pettyCashQList)
+        public PettyCashVM(List<PettyCash> pettyCashList)
         {
-            _pettyCashQList = pettyCashQList;
+            _pettyCashList = pettyCashList;
         }
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -33,7 +33,7 @@ namespace AccSol.ViewModels
 
             if (pcfNo != null)
             {
-                var foundItem = _pettyCashQList.FirstOrDefault(p => p.PCFNo == pcfNo);
+                var foundItem = _pettyCashList.FirstOrDefault(p => p.PCFNo == pcfNo);
                 alreadyExists = foundItem != null;
             }
 
