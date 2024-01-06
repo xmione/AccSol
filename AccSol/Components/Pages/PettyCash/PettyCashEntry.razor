@@ -82,15 +82,12 @@
                                 </div>
                             </ColumnOptions>
                         </PropertyColumn>
-                        <TemplateColumn Title="PCF No" SortBy="@pcfNoSort">
-                            @context.PCFNo
-                        </TemplateColumn>
                         <PropertyColumn Property="@(p => p.Date)" Sortable="true" Format="MM/dd/yyy" />
                         <PropertyColumn Property="@(p => p.Payee)" Sortable="true" />
                         <PropertyColumn Property="@(p => p.Particulars)" Sortable="true" />
                         <PropertyColumn Property="@(p => p.ClientName)" Sortable="true" />
                         <PropertyColumn Property="@(p => p.ProjectName)" Sortable="true" />
-                        <PropertyColumn Property="@(p => p.Amount)" Sortable="true" Format="9,999,999,999,999,999.99" />
+                        <PropertyColumn Property="@(p => p.Amount)" Sortable="true" Format="N2" />
                         <TemplateColumn Title="Action">
                             <button @onclck="@(()=>Edit(context))" class="btn btn-info">Edit</button>
                             <button @onclck="@(()=>Delete(context))" class="btn btn-danger">Delete</button>
@@ -147,41 +144,45 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await GetInitialData();
-        await GetItemsProvider();
+        await GetInitialDataAsync();
+        await GetItemsProviderAsync();
     }
 
-    private async Task GetInitialData()
+    private async Task GetInitialDataAsync()
     {
         Logger.LogInformation("Get() was called to load PettyCash data.");
 
-        await LoadClients();
-        await LoadProjectCodes();
-        await Task.Run(async ()=>
-        {
-            _pettyCashVM.ClientId = _clients[0].ID;
-            _pettyCashVM.ClientName = await GetClientName(_pettyCashVM.ClientId.GetValueOrDefault());
-            _pettyCashVM.ProjectCodeId = _projectCodes[0].ID;
-            _pettyCashVM.ProjectName = await GetProjectName(_pettyCashVM.ProjectCodeId.GetValueOrDefault());
-        });
-
+        await LoadClientsAsync();
+        await LoadProjectCodesAsync();
+        await LoadClientsAndProjectNamesAsync();
         // for the QuickGrid
-        await LoadPettyCashList();
+        await LoadPettyCashListAsync();
     }
 
-    private async Task LoadClients()
+    private async Task LoadClientsAsync()
     {
         var clientList = await _clientService.GetAll();
         _clients = clientList?.OrderBy(c => c.Name).ToList() ?? new List<Client>();
     }
 
-    private async Task LoadProjectCodes()
+    private async Task LoadProjectCodesAsync()
     {
         var projectCodeList = await _projectCodeService.GetAll();
         _projectCodes = projectCodeList?.OrderBy(p => p.Code).ToList() ?? new List<ProjectCode>();
     }
 
-    private async Task LoadPettyCashList()
+    private async Task LoadClientsAndProjectNamesAsync()
+    {
+
+        await Task.Run(async () =>
+            {
+                _pettyCashVM.ClientId = _clients[0].ID;
+                _pettyCashVM.ClientName = await GetClientName(_pettyCashVM.ClientId.GetValueOrDefault());
+                _pettyCashVM.ProjectCodeId = _projectCodes[0].ID;
+                _pettyCashVM.ProjectName = await GetProjectName(_pettyCashVM.ProjectCodeId.GetValueOrDefault());
+            });
+    }
+    private async Task LoadPettyCashListAsync()
     {
         _pettyCashList = (await _service.GetAll()).OrderBy(c => c.Date).ToList();
         _pettyCashVMQList = _pettyCashList
@@ -200,13 +201,17 @@
                 })
             .AsQueryable();
 
-        
+
         _pettyCashVM = new(_pettyCashList);
     }
 
     private void SavePettyCash()
     {
-        
+        if(_pettyCashVM.ClientId == null)
+        {
+            LoadClientsAndProjectNamesAsync().Wait();
+        }
+
         _pettyCash.ID = _pettyCashVM.ID;
         _pettyCash.PCFNo = _pettyCashVM.PCFNo;
         _pettyCash.Date = _pettyCashVM.Date;
@@ -225,7 +230,7 @@
             _pettyCash = _service.Update(_pettyCash).Result;
         }
         
-        GetItemsProvider().Wait();
+        OnInitializedAsync().Wait();
     }
 
     private void Edit(PettyCashVM model)
@@ -285,7 +290,7 @@
         return coa?.AccountName;
     }
     
-    private async Task GetItemsProvider()
+    private async Task GetItemsProviderAsync()
     {
         
         _itemsProvider = async request =>
