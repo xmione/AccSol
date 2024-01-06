@@ -7,9 +7,9 @@
 @using AccSol.EF.Services
 @using AccSol.ViewModels
 
-<PageTitle>Petty Cash</PageTitle>
+<PageTitle>@Title</PageTitle>
 
-<h1>Petty Cash</h1>
+<h1>@Title</h1>
 <div class="container">
     <div class="row">
         <div class="col-md-12">
@@ -114,6 +114,7 @@
 
 @code {
 
+    protected string Title = "Petty Cash Entry";
     private PettyCash _pettyCash = new();
     private List<PettyCash>? _pettyCashList = new();
     private PettyCashVM _pettyCashVM = new();
