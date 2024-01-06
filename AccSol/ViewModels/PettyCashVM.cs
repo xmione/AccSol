@@ -14,7 +14,7 @@ namespace AccSol.ViewModels
         {
             
         }
-        public PettyCashVM(List<PettyCash> pettyCashList)
+        public void SetPettyCashList(List<PettyCash> pettyCashList)
         {
             _pettyCashList = pettyCashList;
         }
