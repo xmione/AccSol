@@ -76,7 +76,7 @@
                 </div>
                 
                 <div class="grid" tabindex="-1">
-                    <QuickGrid ItemsProvider="@_itemsProvider" Virtualize="true" @ref="_grid">
+                    <QuickGrid ItemsProvider="@_itemsProvider" Virtualize="true" @ref="_grid" Pagination="@_pagination">
                         <PropertyColumn Title="PCF No" Property="@(p => p.PCFNo)" Sortable="true" InitialSortDirection="SortDirection.Ascending" IsDefaultSortColumn="true">
                             <ColumnOptions>
                                 <div class="search-box">
@@ -340,37 +340,35 @@
         };
 
     }
-
     private async ValueTask<GridItemsProviderResult<PettyCashVM>> LoadPettyCashListAsync(GridItemsProviderRequest<PettyCashVM> request)
     {
-        GridItemsProviderResult<PettyCashVM> result = new()
-            {
-                Items = _pettyCashVMList,
-                TotalItemCount = _numResults
-            };
+        List<PettyCashVM> paginatedList = new List<PettyCashVM>();
 
         await Task.Run(() =>
         {
             if (_pettyCashVMQList != null)
-            { 
-                _pettyCashVMList = _pettyCashVMQList.Skip(request.StartIndex).Take(_pagination.ItemsPerPage).ToList();
+            {
+                // Apply search filter to the entire dataset
+                var filteredList = _pettyCashVMQList.ToList();
 
                 if (!string.IsNullOrEmpty(_pcfNoSearch))
                 {
-                    _pettyCashVMList = _pettyCashVMList.Where(p => p.PCFNo.Contains(_pcfNoSearch)).ToList();
+                    filteredList = filteredList.Where(p => p.PCFNo.Contains(_pcfNoSearch)).ToList();
                 }
+
+                // Compute the total number of items in the entire dataset (before pagination)
+                _numResults = filteredList.Count;
+
+                // Apply pagination to the filtered list
+                paginatedList = filteredList.Skip(request.StartIndex).Take(_pagination.ItemsPerPage).ToList();
             }
-
-            var count = _pettyCashVMList?.Count();
-            _numResults = count.GetValueOrDefault();
-
-            result = new()
-                {
-                    Items = _pettyCashVMList,
-                    TotalItemCount = _numResults
-                };
         });
 
-        return result;
+        return new GridItemsProviderResult<PettyCashVM>
+            {
+                Items = paginatedList,
+                TotalItemCount = _numResults
+            };
     }
+
 }
