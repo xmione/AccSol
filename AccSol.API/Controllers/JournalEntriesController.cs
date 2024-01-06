@@ -16,7 +16,7 @@ namespace AccSol.API.Controllers
 
         
         [HttpGet("GetAll")]
-        public ActionResult<IEnumerable<JournalEntry>> GetAll()
+        public ActionResult<IEnumerable<Journal>> GetAll()
         {
             var list = _repository.JournalEntry.GetAll(trackChanges: false);
            
@@ -25,11 +25,11 @@ namespace AccSol.API.Controllers
 
         // GET: JournalEntries/GetById/5
         [HttpPost("Get")]
-        public ActionResult<JournalEntry?> Get([FromBody] int? id)
+        public ActionResult<Journal?> Get([FromBody] int? id)
         {
             try
             {
-                JournalEntry? journalEntry = null;
+                Journal? journalEntry = null;
                 if (id != null)
                 {
                     journalEntry = _repository.JournalEntry.Get(id, trackChanges: false);
@@ -44,7 +44,7 @@ namespace AccSol.API.Controllers
             }
         }
         [HttpPost("Create")]
-        public IActionResult Create([FromBody] JournalEntry? journalEntry)
+        public IActionResult Create([FromBody] Journal? journalEntry)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace AccSol.API.Controllers
         }
 
         [HttpPost("Update")]
-        public IActionResult Update([FromBody] JournalEntry? journalEntry)
+        public IActionResult Update([FromBody] Journal? journalEntry)
         {
             try
             {

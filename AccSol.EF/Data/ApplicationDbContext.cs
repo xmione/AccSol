@@ -12,7 +12,7 @@ namespace AccSol.EF.Data
         public virtual DbSet<Client> Clients { get; set; } = null!;
         public virtual DbSet<Department> Departments { get; set; } = null!;
         public virtual DbSet<PettyCash> PettyCashes { get; set; } = null!;
-        public virtual DbSet<JournalEntry> JournalEntries { get; set; } = null!;
+        public virtual DbSet<Journal> JournalEntries { get; set; } = null!;
        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

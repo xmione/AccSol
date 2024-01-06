@@ -91,6 +91,7 @@
                         <PropertyColumn Title="Project Name" Property="@(p => p.ProjectName)" Sortable="true" />
                         <PropertyColumn Title="Amount" Property="@(p => p.Amount)" Sortable="true" Format="N2" />
                         <TemplateColumn Title="Action">
+                            <button @onclick="@(()=>JournalEntry(context))" class="btn btn-info">JournalEntry</button>
                             <button @onclick="@(()=>Edit(context))" class="btn btn-info">Edit</button>
                             <button @onclick="@(()=>Delete(context))" class="btn btn-danger">Delete</button>
                         </TemplateColumn>
@@ -267,6 +268,13 @@
         await OnInitializedAsync();
 
         _pettyCashVM.IsEditing = false;
+    }
+
+    private async Task JournalEntry(PettyCashVM model)
+    {
+        int pettyCashId = model.ID;
+        string url = $"/journal-entry/{pettyCashId}";
+        NavigationManager.NavigateTo(url);
     }
 
     private async Task Edit(PettyCashVM model)

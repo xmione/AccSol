@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 
 namespace AccSol.EF.Services
 {
-    public class JournalEntryService : ICommonService<JournalEntry>
+    public class JournalEntryService : ICommonService<Journal>
     {
         private readonly HttpClient _httpClient;
         public JournalEntryService(HttpClient httpClient) 
@@ -12,16 +12,16 @@ namespace AccSol.EF.Services
             _httpClient = httpClient;
         }
 
-        public async Task<IEnumerable<JournalEntry>?> GetAll()
+        public async Task<IEnumerable<Journal>?> GetAll()
         {
-            IEnumerable<JournalEntry>? list = null;
+            IEnumerable<Journal>? list = null;
 
             try
             {
                 _httpClient.DefaultRequestHeaders.Accept.Clear();
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                list = await _httpClient.GetFromJsonAsync<IEnumerable<JournalEntry>>("JournalEntries/GetAll");
+                list = await _httpClient.GetFromJsonAsync<IEnumerable<Journal>>("JournalEntries/GetAll");
             }
             catch (Exception ex)
             {
@@ -32,12 +32,12 @@ namespace AccSol.EF.Services
             return list;
         }
 
-        public async Task<JournalEntry?> Get(int id)
+        public async Task<Journal?> Get(int id)
         {
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             var getTask = _httpClient.PostAsJsonAsync<int>("JournalEntries/Get", id);
-            JournalEntry? journalEntry = null;
+            Journal? journalEntry = null;
             try
             {
 
@@ -46,7 +46,7 @@ namespace AccSol.EF.Services
                 response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
-                    journalEntry = await response.Content.ReadFromJsonAsync<JournalEntry>();
+                    journalEntry = await response.Content.ReadFromJsonAsync<Journal>();
                 }
 
             }
@@ -57,13 +57,13 @@ namespace AccSol.EF.Services
             return journalEntry;
         }
 
-        public async Task<JournalEntry?> Create(JournalEntry? model)
+        public async Task<Journal?> Create(Journal? model)
         {
             if (model == null)
             {
                 throw new Exception("Invalid or empty model.");
             }
-            JournalEntry? postedModel = null;
+            Journal? postedModel = null;
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             var getTask = _httpClient.PostAsJsonAsync("JournalEntries/Create", model);
@@ -76,7 +76,7 @@ namespace AccSol.EF.Services
 
                 try
                 {
-                    postedModel = await response.Content.ReadFromJsonAsync<JournalEntry>();
+                    postedModel = await response.Content.ReadFromJsonAsync<Journal>();
                 }
                 catch (Exception ex)
                 {
@@ -86,13 +86,13 @@ namespace AccSol.EF.Services
 
             return postedModel;
         }
-        public async Task<JournalEntry?> Update(JournalEntry? model)
+        public async Task<Journal?> Update(Journal? model)
         {
             if (model == null)
             {
                 throw new Exception("Invalid or empty model.");
             }
-            JournalEntry? postedModel = null;
+            Journal? postedModel = null;
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             var getTask = _httpClient.PostAsJsonAsync("JournalEntries/Update", model);
@@ -105,7 +105,7 @@ namespace AccSol.EF.Services
 
                 try
                 {
-                    postedModel = await response.Content.ReadFromJsonAsync<JournalEntry>();
+                    postedModel = await response.Content.ReadFromJsonAsync<Journal>();
                 }
                 catch (Exception ex)
                 {
