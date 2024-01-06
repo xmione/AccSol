@@ -91,8 +91,8 @@
                         <PropertyColumn Property="@(p => p.ProjectName)" Sortable="true" />
                         <PropertyColumn Property="@(p => p.Amount)" Sortable="true" Format="N2" />
                         <TemplateColumn Title="Action">
-                            <button @onclck="@(()=>Edit(context))" class="btn btn-info">Edit</button>
-                            <button @onclck="@(()=>Delete(context))" class="btn btn-danger">Delete</button>
+                            <button @onclick="@(()=>Edit(context))" class="btn btn-info">Edit</button>
+                            <button @onclick="@(()=>Delete(context))" class="btn btn-danger">Delete</button>
                         </TemplateColumn>
                     </QuickGrid>
 
@@ -209,11 +209,36 @@
         _pettyCashVM.SetPettyCashList(_pettyCashList);
     }
 
-    private void SavePettyCash()
+    private async Task DeletePettyCashListAsync()
     {
+        await _service.Delete(_pettyCash.ID);
+
+        _pettyCashVMQList = _pettyCashList
+            .Select(p => new PettyCashVM
+                {
+                    ID = p.ID,
+                    PCFNo = p.PCFNo,
+                    Date = p.Date,
+                    Payee = p.Payee,
+                    Particulars = p.Particulars,
+                    ClientId = p.ClientId,
+                    ProjectCodeId = p.ProjectCodeId,
+                    Amount = p.Amount,
+                    ClientName = GetClientNameAsync(p.ClientId.GetValueOrDefault())?.Result,
+                    ProjectName = GetProjectNameAsync(p.ProjectCodeId.GetValueOrDefault())?.Result,
+                })
+            .AsQueryable();
+
+
+        _pettyCashVM.SetPettyCashList(_pettyCashList);
+    }
+
+    private async Task SavePettyCash()
+    {
+
         if(_pettyCashVM.ClientId == null)
         {
-            LoadClientsAndProjectNamesAsync().Wait();
+            await LoadClientsAndProjectNamesAsync();
         }
 
         _pettyCash.ID = _pettyCashVM.ID;
@@ -227,43 +252,37 @@
 
         _pettyCashList?.Add(_pettyCash);
 
-        if (_pettyCash.ID == 0)
+        if (!_pettyCashVM.IsEditing)
         {
-            _pettyCash = _service.Create(_pettyCash).Result;
+            _pettyCash = await _service.Create(_pettyCash);
         }
         else
         {
-            _pettyCash = _service.Update(_pettyCash).Result;
+            _pettyCash = await _service.Update(_pettyCash);
         }
 
-        GetItemsProvider();
+        _pettyCashVM = new();
+
+        await OnInitializedAsync();
+
+        _pettyCashVM.IsEditing = false;
     }
 
-    private void Edit(PettyCashVM model)
+    private async Task Edit(PettyCashVM model)
     {
-        var foundModel = _pettyCashVMList?.FirstOrDefault(j => j.ID == model.ID);
+        _pettyCashVM = model;
 
-        if (foundModel != null)
-        {
-            foundModel.PCFNo = model.PCFNo;
-            foundModel.Date = model.Date;
-            foundModel.Payee = model.Payee;
-            foundModel.Payee = model.Payee;
-            foundModel.Particulars = model.Particulars;
-            foundModel.ClientId = model.ClientId;
-            foundModel.ProjectCodeId = model.ProjectCodeId;
-            foundModel.Amount = model.Amount;
-            foundModel.Particulars = model.Particulars;
+        _pettyCashVM.IsEditing = true;
 
-            //GetItemsProvider().Wait();
-        }
+        await OnInitializedAsync();
     }
 
-    private void Delete(PettyCashVM model)
+    private async Task Delete(PettyCashVM model)
     {
-        _pettyCashVMList?.Remove(model);
+        await _service.Delete(model.ID);
+        _pettyCashVM = new();
 
-        //GetItemsProvider().Wait();
+        await OnInitializedAsync();
     }
 
     private async Task<string>? GetClientNameAsync(int id)
