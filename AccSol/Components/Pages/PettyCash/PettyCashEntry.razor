@@ -7,9 +7,9 @@
 @using AccSol.EF.Services
 @using AccSol.ViewModels
 
-<PageTitle>Petty Cash</PageTitle>
+<PageTitle>@Title</PageTitle>
 
-<h1>Petty Cash</h1>
+<h1>@Title</h1>
 <div class="container">
     <div class="row">
         <div class="col-md-12">
@@ -76,20 +76,20 @@
                 </div>
                 
                 <div class="grid" tabindex="-1">
-                    <QuickGrid ItemsProvider="@_itemsProvider" Virtualize="true" @ref="_grid">
-                        <PropertyColumn Property="@(p => p.PCFNo)" Sortable="true" InitialSortDirection="SortDirection.Ascending" IsDefaultSortColumn="true">
+                    <QuickGrid ItemsProvider="@_itemsProvider" Virtualize="true" @ref="_grid" Pagination="@_pagination">
+                        <PropertyColumn Title="PCF No" Property="@(p => p.PCFNo)" Sortable="true" InitialSortDirection="SortDirection.Ascending" IsDefaultSortColumn="true">
                             <ColumnOptions>
                                 <div class="search-box">
                                     <input type="search" autofocus @bind="_pcfNoSearch" @bind:event="oninput" placeholder="PCF No..." />
                                 </div>
                             </ColumnOptions>
                         </PropertyColumn>
-                        <PropertyColumn Property="@(p => p.Date)" Sortable="true" Format="MM/dd/yyy" />
-                        <PropertyColumn Property="@(p => p.Payee)" Sortable="true" />
-                        <PropertyColumn Property="@(p => p.Particulars)" Sortable="true" />
-                        <PropertyColumn Property="@(p => p.ClientName)" Sortable="true" />
-                        <PropertyColumn Property="@(p => p.ProjectName)" Sortable="true" />
-                        <PropertyColumn Property="@(p => p.Amount)" Sortable="true" Format="N2" />
+                        <PropertyColumn Title="Date" Property="@(p => p.Date)" Sortable="true" Format="MM/dd/yyy" />
+                        <PropertyColumn Title="Payee" Property="@(p => p.Payee)" Sortable="true" />
+                        <PropertyColumn Title="Particulars" Property="@(p => p.Particulars)" Sortable="true" />
+                        <PropertyColumn Title="Client Name" Property="@(p => p.ClientName)" Sortable="true" />
+                        <PropertyColumn Title="Project Name" Property="@(p => p.ProjectName)" Sortable="true" />
+                        <PropertyColumn Title="Amount" Property="@(p => p.Amount)" Sortable="true" Format="N2" />
                         <TemplateColumn Title="Action">
                             <button @onclick="@(()=>Edit(context))" class="btn btn-info">Edit</button>
                             <button @onclick="@(()=>Delete(context))" class="btn btn-danger">Delete</button>
@@ -114,6 +114,7 @@
 
 @code {
 
+    protected string Title = "Petty Cash Entry";
     private PettyCash _pettyCash = new();
     private List<PettyCash>? _pettyCashList = new();
     private PettyCashVM _pettyCashVM = new();
@@ -339,28 +340,35 @@
         };
 
     }
-
     private async ValueTask<GridItemsProviderResult<PettyCashVM>> LoadPettyCashListAsync(GridItemsProviderRequest<PettyCashVM> request)
     {
-        GridItemsProviderResult<PettyCashVM> result = new()
-            {
-                Items = _pettyCashVMList,
-                TotalItemCount = _numResults
-            };
+        List<PettyCashVM> paginatedList = new List<PettyCashVM>();
 
         await Task.Run(() =>
         {
-            _pettyCashVMList = _pettyCashVMQList?.Skip(request.StartIndex).Take(_pagination.ItemsPerPage).ToList();
-            var count = _pettyCashVMList?.Count();
-            _numResults = count.GetValueOrDefault();
+            if (_pettyCashVMQList != null)
+            {
+                // Apply search filter to the entire dataset
+                var filteredList = _pettyCashVMQList.ToList();
 
-            result = new()
+                if (!string.IsNullOrEmpty(_pcfNoSearch))
                 {
-                    Items = _pettyCashVMList,
-                    TotalItemCount = _numResults
-                };
+                    filteredList = filteredList.Where(p => p.PCFNo.Contains(_pcfNoSearch)).ToList();
+                }
+
+                // Compute the total number of items in the entire dataset (before pagination)
+                _numResults = filteredList.Count;
+
+                // Apply pagination to the filtered list
+                paginatedList = filteredList.Skip(request.StartIndex).Take(_pagination.ItemsPerPage).ToList();
+            }
         });
 
-        return result;
+        return new GridItemsProviderResult<PettyCashVM>
+            {
+                Items = paginatedList,
+                TotalItemCount = _numResults
+            };
     }
+
 }
