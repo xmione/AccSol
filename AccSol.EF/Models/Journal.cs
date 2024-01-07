@@ -1,6 +1,6 @@
 ﻿namespace AccSol.EF.Models
 {
-    public class JournalEntry 
+    public class Journal 
     {
         public int ID { get; set; }
         public int? PettyCashId { get; set; }

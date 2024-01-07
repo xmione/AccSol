@@ -91,6 +91,7 @@
                         <PropertyColumn Title="Project Name" Property="@(p => p.ProjectName)" Sortable="true" />
                         <PropertyColumn Title="Amount" Property="@(p => p.Amount)" Sortable="true" Format="N2" />
                         <TemplateColumn Title="Action">
+                            <button @onclick="@(()=>JournalEntry(context))" class="btn btn-info">JournalEntry</button>
                             <button @onclick="@(()=>Edit(context))" class="btn btn-info">Edit</button>
                             <button @onclick="@(()=>Delete(context))" class="btn btn-danger">Delete</button>
                         </TemplateColumn>
@@ -115,7 +116,7 @@
 @code {
 
     protected string Title = "Petty Cash Entry";
-    private PettyCash _pettyCash = new();
+    
     private List<PettyCash>? _pettyCashList = new();
     private PettyCashVM _pettyCashVM = new();
     private List<PettyCashVM> _pettyCashVMList = new();
@@ -136,7 +137,7 @@
     private PaginationState _pagination = new PaginationState { ItemsPerPage = 10 };
 
     [Inject]
-    public ICommonService<PettyCash> _service { get; set; }
+    public ICommonService<PettyCash> _pettyCashService { get; set; }
     [Inject]
     public ICommonService<Client> _clientService { get; set; }
     [Inject]
@@ -155,9 +156,11 @@
     {
         Logger.LogInformation("Get() was called to load PettyCash data.");
 
+        // load first the master files
         await LoadClientsAsync();
         await LoadProjectCodesAsync();
-        await LoadClientsAndProjectNamesAsync();
+
+        // then load the transaction files
         // for the QuickGrid
         await LoadPettyCashListAsync();
     }
@@ -174,92 +177,40 @@
         _projectCodes = projectCodeList?.OrderBy(p => p.Code).ToList() ?? new List<ProjectCode>();
     }
 
-    private async Task LoadClientsAndProjectNamesAsync()
-    {
-        int clientId = _clients[0].ID;
-        int projectCodeId =_projectCodes[0].ID; 
-        var clientName = await GetClientNameAsync(clientId); 
-        var projectName = await GetProjectNameAsync(projectCodeId);
-
-        _pettyCashVM.ClientId = clientId;
-        _pettyCashVM.ClientName = clientName;
-        _pettyCashVM.ProjectCodeId = projectCodeId;
-        _pettyCashVM.ProjectName = projectName;
-
-    }
     private async Task LoadPettyCashListAsync()
     {
-        _pettyCashList = (await _service.GetAll()).OrderBy(c => c.Date).ToList();
+        _pettyCashList = (await _pettyCashService.GetAll()).OrderBy(c => c.Date).ToList();
         _pettyCashVMQList = _pettyCashList
-            .Select(p => new PettyCashVM
-                {
-                    ID = p.ID,
-                    PCFNo = p.PCFNo,
-                    Date = p.Date,
-                    Payee = p.Payee,
-                    Particulars = p.Particulars,
-                    ClientId = p.ClientId,
-                    ProjectCodeId = p.ProjectCodeId,
-                    Amount = p.Amount,
-                    ClientName = GetClientNameAsync(p.ClientId.GetValueOrDefault())?.Result,
-                    ProjectName = GetProjectNameAsync(p.ProjectCodeId.GetValueOrDefault())?.Result,
-                })
+            .Select(p => new PettyCashVM(p, _clients, _projectCodes))
             .AsQueryable();
 
-
+        // load new PettyCashVM with client and projectCode list 
+        _pettyCashVM = new PettyCashVM(_pettyCashVM, _clients, _projectCodes);
         _pettyCashVM.SetPettyCashList(_pettyCashList);
     }
 
     private async Task DeletePettyCashListAsync()
     {
-        await _service.Delete(_pettyCash.ID);
+        await _pettyCashService.Delete(_pettyCashVM.ID);
 
         _pettyCashVMQList = _pettyCashList
-            .Select(p => new PettyCashVM
-                {
-                    ID = p.ID,
-                    PCFNo = p.PCFNo,
-                    Date = p.Date,
-                    Payee = p.Payee,
-                    Particulars = p.Particulars,
-                    ClientId = p.ClientId,
-                    ProjectCodeId = p.ProjectCodeId,
-                    Amount = p.Amount,
-                    ClientName = GetClientNameAsync(p.ClientId.GetValueOrDefault())?.Result,
-                    ProjectName = GetProjectNameAsync(p.ProjectCodeId.GetValueOrDefault())?.Result,
-                })
+            .Select(p => new PettyCashVM(p,_clients, _projectCodes))
             .AsQueryable();
-
 
         _pettyCashVM.SetPettyCashList(_pettyCashList);
     }
 
     private async Task SavePettyCash()
     {
-
-        if(_pettyCashVM.ClientId == null)
-        {
-            await LoadClientsAndProjectNamesAsync();
-        }
-
-        _pettyCash.ID = _pettyCashVM.ID;
-        _pettyCash.PCFNo = _pettyCashVM.PCFNo;
-        _pettyCash.Date = _pettyCashVM.Date;
-        _pettyCash.Payee = _pettyCashVM.Payee;
-        _pettyCash.Particulars = _pettyCashVM.Particulars;
-        _pettyCash.ClientId = _pettyCashVM.ClientId;
-        _pettyCash.ProjectCodeId = _pettyCashVM.ProjectCodeId;
-        _pettyCash.Amount = _pettyCashVM.Amount;
-
-        _pettyCashList?.Add(_pettyCash);
+        _pettyCashList?.Add(_pettyCashVM);
 
         if (!_pettyCashVM.IsEditing)
         {
-            _pettyCash = await _service.Create(_pettyCash);
+            await _pettyCashService.Create(_pettyCashVM);
         }
         else
         {
-            _pettyCash = await _service.Update(_pettyCash);
+            await _pettyCashService.Update(_pettyCashVM);
         }
 
         _pettyCashVM = new();
@@ -269,51 +220,28 @@
         _pettyCashVM.IsEditing = false;
     }
 
+    private async Task JournalEntry(PettyCashVM model)
+    {
+        int pettyCashId = model.ID;
+        string url = $"/journal-entry/{pettyCashId}";
+        NavigationManager.NavigateTo(url);
+    }
+
     private async Task Edit(PettyCashVM model)
     {
         _pettyCashVM = model;
 
-        _pettyCashVM.IsEditing = true;
-
         await OnInitializedAsync();
+
+        _pettyCashVM.IsEditing = true;
     }
 
     private async Task Delete(PettyCashVM model)
     {
-        await _service.Delete(model.ID);
+        await _pettyCashService.Delete(model.ID);
         _pettyCashVM = new();
 
         await OnInitializedAsync();
-    }
-
-    private async Task<string>? GetClientNameAsync(int id)
-    {
-        string? name = string.Empty;
-
-        await Task.Run(() =>
-        {
-            name = _clients?.FirstOrDefault(c => c.ID == id)?.Name;
-        });
-
-        return name;
-    }
-
-    private async Task<string>? GetProjectNameAsync(int id)
-    {
-        string? name = string.Empty;
-
-        await Task.Run(() =>
-        {
-            name = _projectCodes?.FirstOrDefault(c => c.ID == id)?.Description;
-        });
-
-        return name;
-    }
-
-    private string? GetAccountName(int coaId)
-    {
-        var coa = _coaService.Get(coaId).Result;
-        return coa?.AccountName;
     }
 
     private void GetItemsProvider()
@@ -353,7 +281,7 @@
 
                 if (!string.IsNullOrEmpty(_pcfNoSearch))
                 {
-                    filteredList = filteredList.Where(p => p.PCFNo.Contains(_pcfNoSearch)).ToList();
+                    filteredList = filteredList.Where(p => p.PCFNo.ToLower().Contains(_pcfNoSearch.ToLower())).ToList();
                 }
 
                 // Compute the total number of items in the entire dataset (before pagination)

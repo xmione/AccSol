@@ -1,8 +1,6 @@
 ﻿using AccSol.EF.Models;
-using AccSol.EF.Services;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace AccSol.ViewModels
 {
@@ -11,10 +9,54 @@ namespace AccSol.ViewModels
         public string? ClientName { get; set; }
         public string? ProjectName { get; set; }
         private List<PettyCash> _pettyCashList = new List<PettyCash>(); // Initialize the list
+        private List<Client> _clients = new List<Client>(); // Initialize the list
+        private List<ProjectCode> _projectCodes = new List<ProjectCode>(); // Initialize the list
+
         public bool IsEditing { get; set; } // Boolean property to indicate editing mode
 
         public PettyCashVM()
         {
+        }
+        public PettyCashVM(PettyCash pettyCash, List<Client> clientList, List<ProjectCode> projectCodeList)
+        {
+            _clients = clientList;
+            _projectCodes = projectCodeList;
+
+            ID = pettyCash.ID;
+            PCFNo = pettyCash.PCFNo;
+            Date = pettyCash.Date;
+            Payee = pettyCash.Payee;
+            Particulars = pettyCash.Particulars;
+            Amount = pettyCash.Amount;
+            
+            int clientId = pettyCash.ClientId ?? _clients[0].ID;
+            int projectCodeId = pettyCash.ProjectCodeId ?? _projectCodes[0].ID;
+            ClientId = clientId;
+            ProjectCodeId = projectCodeId;
+
+            ClientName = GetClientName(clientId);
+            ProjectName = GetProjectName(projectCodeId);
+        }
+        public PettyCashVM(PettyCashVM pettyCashVM, List<Client> clientList, List<ProjectCode> projectCodeList)
+        {
+            
+            _clients = clientList;
+            _projectCodes = projectCodeList;
+
+            ID = pettyCashVM.ID;
+            PCFNo = pettyCashVM.PCFNo;
+            Date = pettyCashVM.Date;
+            Payee = pettyCashVM.Payee;
+            Particulars = pettyCashVM.Particulars;
+            Amount = pettyCashVM.Amount;
+
+            int clientId = pettyCashVM.ClientId ?? _clients[0].ID;
+            int projectCodeId = pettyCashVM.ProjectCodeId ?? _projectCodes[0].ID;
+            ClientId = clientId;
+            ProjectCodeId = projectCodeId;
+
+            ClientName = pettyCashVM.ClientId != null? pettyCashVM.ClientName : GetClientName(clientId);
+            ProjectName = pettyCashVM.ProjectCodeId != null? pettyCashVM.ProjectName : GetProjectName(projectCodeId);
         }
 
         public void SetPettyCashList(List<PettyCash> pettyCashList)
@@ -51,5 +93,24 @@ namespace AccSol.ViewModels
 
             return alreadyExists;
         }
+
+        private string GetClientName(int id)
+        {
+            string name = string.Empty;
+
+            name = _clients?.FirstOrDefault(c => c.ID == id)?.Name;
+
+            return name;
+        }
+
+        private string GetProjectName(int id)
+        {
+            string name = string.Empty;
+
+            name = _projectCodes?.FirstOrDefault(c => c.ID == id)?.Description;
+
+            return name;
+        }
+
     }
 }

@@ -22,4 +22,8 @@
     <ProjectReference Include="..\AccSol.EF\AccSol.EF.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Components\Pages\PettyCash\" />
+  </ItemGroup>
+
 </Project>

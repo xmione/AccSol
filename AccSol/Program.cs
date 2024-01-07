@@ -52,7 +52,7 @@ builder.Services.AddHttpClient<ICommonService<PettyCash>, PettyCashService>(clie
 {
     client.BaseAddress = baseAddress != null ? new Uri(baseAddress) : null;
 });
-builder.Services.AddHttpClient<ICommonService<JournalEntry>, JournalEntryService>(client =>
+builder.Services.AddHttpClient<ICommonService<Journal>, JournalEntryService>(client =>
 {
     client.BaseAddress = baseAddress != null ? new Uri(baseAddress) : null;
 });

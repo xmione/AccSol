@@ -1,0 +1,334 @@
+﻿@page "/journal-entry/{_pettyCashId:int}"
+
+@inject ILogger<Index> Logger
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@using AccSol.EF.Models
+@using AccSol.EF.Services
+@using AccSol.ViewModels
+
+<PageTitle>@Title</PageTitle>
+
+<h1>@Title</h1>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card-header">
+                <div class="d-flex flex-row" style="overflow-x: auto;">
+                    <div class="form-group mx-2">
+                        <label for="pcfNo" class="form-label">PCFNo</label>
+                        <InputText id="pcfNo" class="form-control" @bind-Value="_pettyCashVM.PCFNo" readonly />
+                    </div>
+                    <div class="form-group mx-2">
+                        <label for="date" class="form-label">Date</label>
+                        <InputDate id="date" class="form-control" @bind-Value="_pettyCashVM.Date" readonly />
+                    </div>
+                    <div class="form-group mx-2">
+                        <label for="payee" class="form-label">Payee</label>
+                        <InputText id="payee" class="form-control" @bind-Value="_pettyCashVM.Payee" readonly />
+                    </div>
+                    <div class="form-group mx-2">
+                        <label for="particulars" class="form-label">Particulars</label>
+                        <InputText id="particulars" class="form-control" @bind-Value="_pettyCashVM.Particulars" readonly />
+                    </div>
+                    <div class="form-group mx-2">
+                        <label for="client" class="form-label">Client</label>
+                        <InputText id="clientName" class="form-control" @bind-Value="_pettyCashVM.ClientName" readonly />
+                    </div>
+                    <div class="form-group mx-2">
+                        <label for="project" class="form-label" style="white-space: nowrap;">Project</label>
+                        <InputText id="projectName" class="form-control" @bind-Value="_pettyCashVM.ProjectName" readonly />
+                    </div>
+                    <div class="form-group mx-2">
+                        <label for="amount" class="form-label">Amount</label>
+                        <InputNumber id="amount" class="form-control" @bind-Value="_pettyCashVM.Amount" step="0.01" readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card-header">
+                <EditForm Model="@_journalVM" OnValidSubmit="@SaveJournalEntry" Enhance>
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="d-flex flex-row" style="overflow-x: auto;">
+                        <div class="form-group mx-2">
+                            <label for="accountName" class="form-label">Coa</label>
+                            <InputSelect id="accountName" class="form-control" @bind-Value="_journalVM.CoaId">
+                                @foreach (var coa in _coas)
+                                {
+                                    <option value="@coa.ID">@coa.AccountName</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-group mx-2">
+                            <label for="debit" class="form-label">Debit</label>
+                            <InputNumber id="debit" class="form-control" @bind-Value="_journalVM.Debit" step="0.01" />
+                        </div>
+                        <div class="form-group mx-2">
+                            <label for="credit" class="form-label">Credit</label>
+                            <InputNumber id="credit" class="form-control" @bind-Value="_journalVM.Credit" step="0.01" />
+                        </div>
+                        <div class="form-group mx-2 d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary" style="height:38px; padding: 6px 12px;align-self: flex-end;">Save</button>
+                        </div>
+                    </div>
+                    <InputText type="hidden" @bind-Value="_journalVM.AccountName" />
+                </EditForm>
+            </div>
+            <div class="card-body">
+                <div class="page-size-chooser">
+                    Items per page:
+                    <select id="itemsPerPage" @bind="@_pagination.ItemsPerPage">
+                        <option>5</option>
+                        <option>10</option>
+                        <option>20</option>
+                        <option>50</option>
+                    </select>
+                </div>
+                
+                <div class="grid" tabindex="-1">
+                    <QuickGrid ItemsProvider="@_itemsProvider" Virtualize="true" @ref="_grid" Pagination="@_pagination">
+                        <PropertyColumn Title="Account Name" Property="@(p => p.AccountName)" Sortable="true" InitialSortDirection="SortDirection.Ascending" IsDefaultSortColumn="true">
+                            <ColumnOptions>
+                                <div class="search-box">
+                                    <input type="search" autofocus @bind="_accountNameSearch" @bind:event="oninput" placeholder="Account Name..." />
+                                </div>
+                            </ColumnOptions>
+                        </PropertyColumn>
+                        <PropertyColumn Title="Debit" Property="@(p => p.Debit)" Sortable="true" Format="N2" />
+                        <PropertyColumn Title="Credit" Property="@(p => p.Credit)" Sortable="true" Format="N2" />
+                        <TemplateColumn Title="Action">
+                            <button @onclick="@(()=>Edit(context))" class="btn btn-info">Edit</button>
+                            <button @onclick="@(()=>Delete(context))" class="btn btn-danger">Delete</button>
+                        </TemplateColumn>
+                    </QuickGrid>
+
+                </div>
+                <Paginator State="@_pagination" />
+                <div class="my-2">
+                    <div class="search-box inline-block mr-4 my-1">
+                        <input id="search" type="search" autofocus @bind="_accountNameSearch" @bind:event="oninput" @bind:after="()=>_grid?.RefreshDataAsync()" placeholder="Account Name..." />
+                    </div>
+
+                    <div class="inline-block my-1">
+                        Total: <strong>@_numResults results found</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int _pettyCashId { get; set; }
+
+    protected string Title = "Journal Entry";
+    private PettyCashVM _pettyCashVM = new();
+    private List<PettyCashVM> _pettyCashVMList = new();
+    private List<Client> _clients = new();
+    private List<ProjectCode> _projectCodes = new();
+    private List<Coa> _coas = new();
+
+    private string? _clientName = null;
+    private string? _projectName = null;
+    private string? _accountName = null;
+
+    private List<Journal>? _journalList = new();
+    private JournalVM _journalVM = new();
+    private List<JournalVM> _journalVMList = new();
+    private IQueryable<Journal>? _journalQList;
+    private IQueryable<JournalVM>? _journalVMQList;
+
+    private QuickGrid<JournalVM>? _grid;
+    private GridItemsProvider<JournalVM>? _itemsProvider;
+    private int _numResults;
+    private string _accountNameSearch;
+    private GridSort<JournalVM> accountNameSort = GridSort<JournalVM>.ByAscending(x => x.AccountName);
+    private PaginationState _pagination = new PaginationState { ItemsPerPage = 10 };
+
+    [Inject]
+    public ICommonService<PettyCash> _pettyCashService { get; set; }
+    [Inject]
+    public ICommonService<Journal> _journalService { get; set; }
+    [Inject]
+    public ICommonService<Coa> _coaService { get; set; }
+    [Inject]
+    public ICommonService<Client> _clientService { get; set; }
+    [Inject]
+    public ICommonService<ProjectCode> _projectCodeService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetInitialDataAsync();
+        GetItemsProvider();
+    }
+
+    private async Task GetInitialDataAsync()
+    {
+        Logger.LogInformation("Get() was called to load JournalEntry data.");
+
+        // load first the master files
+        await LoadCoasAsync();
+        await LoadClientsAsync();
+        await LoadProjectCodesAsync();
+
+        // then load the transaction files
+        await LoadPettyCashAsync();
+
+        // for the QuickGrid
+        await LoadJournalListAsync();
+    }
+
+    private async Task LoadCoasAsync()
+    {
+        var accountNameList = await _coaService.GetAll();
+        _coas = accountNameList?.OrderBy(c => c.AccountName).ToList() ?? new List<Coa>();
+    }
+
+    private async Task LoadClientsAsync()
+    {
+        var clientList = await _clientService.GetAll();
+        _clients = clientList?.OrderBy(c => c.Name).ToList() ?? new List<Client>();
+    }
+
+    private async Task LoadProjectCodesAsync()
+    {
+        var projectCodeList = await _projectCodeService.GetAll();
+        _projectCodes = projectCodeList?.OrderBy(p => p.Code).ToList() ?? new List<ProjectCode>();
+    }
+
+    private async Task LoadPettyCashAsync()
+    {
+        var pettyCash = await _pettyCashService.Get(_pettyCashId);
+        _pettyCashVM = new PettyCashVM(pettyCash, _clients, _projectCodes);
+    }
+
+    private async Task LoadJournalListAsync()
+    {
+        _journalList = (await _journalService.GetAll())?.Where(j => j.PettyCashId == _pettyCashVM.ID).ToList();
+        _journalVMQList = _journalList
+            .Select(j => new JournalVM(j, _coas))
+            .OrderBy(c => c.AccountName)
+            .AsQueryable();
+
+        _journalVMList = _journalVMQList.ToList();
+
+        // make sure to set the PettyCashId of the current journal entry first
+        _journalVM.PettyCashId = _pettyCashId;
+
+        // load new JournalVM with coa list 
+        _journalVM = new JournalVM(_journalVM, _coas);
+        _journalVM.SetJournalEntryVMList(_journalVMQList.ToList());
+    }
+
+    private async Task DeleteJournalEntryListAsync()
+    {
+        await _journalService.Delete(_journalVM.ID);
+
+        _journalVMQList = _journalList
+            .Select(j => new JournalVM(j, _coas))
+            .OrderBy(c => c.AccountName)
+            .AsQueryable();
+
+        _journalVMList = _journalVMQList.ToList();
+        _journalVM.SetJournalEntryVMList(_journalVMQList.ToList());
+    }
+
+    private async Task SaveJournalEntry()
+    {
+        _journalList?.Add(_journalVM);
+
+        if (!_journalVM.IsEditing)
+        {
+            await _journalService.Create(_journalVM);
+        }
+        else
+        {
+            await _journalService.Update(_journalVM);
+        }
+
+        _journalVM = new();
+
+        await OnInitializedAsync();
+
+        _journalVM.IsEditing = false;
+    }
+
+    private async Task Edit(JournalVM model)
+    {
+        _journalVM = model;
+
+        await OnInitializedAsync();
+
+        _journalVM.IsEditing = true;
+    }
+
+    private async Task Delete(JournalVM model)
+    {
+        await _journalService.Delete(model.ID);
+        _journalVM = new();
+
+        await OnInitializedAsync();
+    }
+
+    private void GetItemsProvider()
+    {
+        Console.WriteLine("Entering _itemsProvider await");
+
+        _itemsProvider = async request =>
+        {
+            Console.WriteLine("Entering _itemsProvider lambda");
+
+            await Task.Delay(1000); // Introduce a delay for debugging purposes
+
+            var result = await LoadJournalEntryListAsync(request);
+
+            if (result.TotalItemCount != _numResults && !request.CancellationToken.IsCancellationRequested)
+            {
+                Console.WriteLine("Refreshing state");
+                _numResults = result.TotalItemCount;
+                StateHasChanged();
+            }
+
+            Console.WriteLine("Exiting _itemsProvider lambda");
+            return result;
+        };
+
+    }
+    private async ValueTask<GridItemsProviderResult<JournalVM>> LoadJournalEntryListAsync(GridItemsProviderRequest<JournalVM> request)
+    {
+        List<JournalVM> paginatedList = new List<JournalVM>();
+
+        await Task.Run(() =>
+        {
+            if (_journalVMQList != null)
+            {
+                // Apply search filter to the entire dataset
+                var filteredList = _journalVMQList.ToList();
+
+                if (!string.IsNullOrEmpty(_accountNameSearch))
+                {
+                    filteredList = filteredList.Where(p => p.AccountName.ToLower().Contains(_accountNameSearch.ToLower())).ToList();
+                }
+
+                // Compute the total number of items in the entire dataset (before pagination)
+                _numResults = filteredList.Count;
+
+                // Apply pagination to the filtered list
+                paginatedList = filteredList.Skip(request.StartIndex).Take(_pagination.ItemsPerPage).ToList();
+            }
+        });
+
+        return new GridItemsProviderResult<JournalVM>
+            {
+                Items = paginatedList,
+                TotalItemCount = _numResults
+            };
+    }
+
+}
