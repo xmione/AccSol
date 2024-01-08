@@ -4,6 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+
 // Add services to the container.
 builder.Services.AddCors(c =>
 {
@@ -13,6 +17,7 @@ builder.Services.AddCors(c =>
 });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString, b => b.MigrationsAssembly("AccSol.EF")), ServiceLifetime.Scoped);
 
@@ -33,6 +38,20 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+
+    // migrate any database changes on startup (includes initial db creation)
+    // Important!: This will automatically create the database in case missing.
+    //           : No need to switch to master database.
+    //Start - Automatically update db from new migrations ====================>
+    var contextOptions = new DbContextOptionsBuilder<ApplicationDbContext>()
+        .UseSqlServer(connectionString)
+        .Options;
+
+    var context = new ApplicationDbContext(contextOptions);
+    context.Database.Migrate();
+
+    //End   - Automatically update db from new migrations ====================>
+
     app.UseSwagger();
     app.UseSwaggerUI();
 }
@@ -46,3 +65,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+

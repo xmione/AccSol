@@ -8,3 +8,49 @@ How to specify migration and startup project when running Add-Migrations
 
 How to remove it (the current migration).
 1. Remove-Migration -StartupProject AccSol.API -Project AccSol.EF
+
+How to test sqlserver if up.
+1. Run ipconfig in a command prompt and get the ipaddress.
+
+Wireless LAN adapter Wi-Fi:
+
+   Connection-specific DNS Suffix  . :
+   Link-local IPv6 Address . . . . . : fe80::9b5c:ef9f:1264:86cb%7
+   IPv4 Address. . . . . . . . . . . : 192.168.100.33
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . : 192.168.100.1
+
+2. Get the IPv4 Address and ping.
+
+	ping 192.168.100.33
+
+3. If you want to access it via host name, modify your docker-compose.yml file.
+
+    version: '3.7'
+
+    services:
+      db:
+        image: solomiosisante/sqlserver:dev2019
+        environment:
+          SA_PASSWORD: P@ssw0rd123
+          ACCEPT_EULA: Y
+        ports:
+          - "1433:1433"
+        networks:
+          - accsolnet
+        hostname: sqlserver
+
+4. Run docker-compose up to compile the yml file and rebuild and run the containers again. 
+    docker-compose up
+
+5. You can now ping by hostname instead.
+
+    ping sqlserver
+
+6. Test if you can connect from host.
+
+    sqlcmd -S 192.168.100.33 -U SA -P 'P@ssw0rd123'
+
+    or
+
+    sqlcmd -S sqlserver -U SA -P 'P@ssw0rd123'

@@ -10,19 +10,19 @@ EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0-nanoserver-1809 AS build
 ARG BUILD_CONFIGURATION=Release
-
 WORKDIR /src
-COPY ["AccSol.API/AccSol.API.csproj", "AccSol.API/"]
-RUN dotnet restore "./AccSol.API/./AccSol.API.csproj"
+COPY ["AccSol/AccSol.csproj", "AccSol/"]
+COPY ["AccSol.EF/AccSol.EF.csproj", "AccSol.EF/"]
+RUN dotnet restore "./AccSol/./AccSol.csproj"
 COPY . .
-WORKDIR "/src/AccSol.API"
-RUN dotnet build "./AccSol.API.csproj" -c %BUILD_CONFIGURATION% -o /app/build
+WORKDIR "/src/AccSol"
+RUN dotnet build "./AccSol.csproj" -c %BUILD_CONFIGURATION% -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./AccSol.API.csproj" -c %BUILD_CONFIGURATION% -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./AccSol.csproj" -c %BUILD_CONFIGURATION% -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "AccSol.API.dll"]
+ENTRYPOINT ["dotnet", "AccSol.dll"]

@@ -1,0 +1,69 @@
+version: '3.7'
+
+services:
+  db:
+    container_name: sqlserver
+    image: solomiosisante/sqlserver:dev2019
+    environment:
+      SA_PASSWORD: P@ssw0rd123
+      ACCEPT_EULA: Y
+    ports:
+      - "1433:1433"
+    hostname: sqlserver
+    networks:
+      accsolnet:
+        ipv4_address: 172.20.0.12
+
+  webapp:
+    container_name: accsol
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+    build:
+      context: .
+      dockerfile: ./AccSol/Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    hostname: AccSol
+    networks:
+      accsolnet:
+        ipv4_address: 172.20.0.10
+
+  api:
+    container_name: accsol.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+    build:
+      context: .
+      dockerfile: ./AccSol.API/Dockerfile
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    hostname: AccSol.API
+    networks:
+      accsolnet:
+        ipv4_address: 172.20.0.11
+    expose:
+      - "8081"
+  # sqlcmd:
+  #   container_name: sqlcmd
+  #   image: mcr.microsoft.com/windows/servercore:ltsc2019
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     accsolnet:
+  #       ipv4_address: 172.20.0.13
+  #   volumes:
+  #     - ./AccSol.EF/Data:c:\sql
+  #   command: /bin/bash -c "sleep 20 && docker cp /sql/CreateData.sql sqlcmd:/sql/CreateData.sql && docker exec sqlcmd /opt/mssql-tools/bin/sqlcmd -S db -U sa -P P@ssw0rd123 -d AccSol -i CreateData.sql"
+
+networks:
+  accsolnet:
+    name: accsolnet
+    driver: nat
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
