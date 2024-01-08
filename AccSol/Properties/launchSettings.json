@@ -32,8 +32,8 @@
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Docker",
-        "ASPNETCORE_HTTPS_PORTS": "8081",
-        "ASPNETCORE_HTTP_PORTS": "8080"
+        "ASPNETCORE_HTTPS_PORTS": "7010",
+        "ASPNETCORE_HTTP_PORTS": "5154"
       },
       "publishAllPorts": true,
       "useSSL": true

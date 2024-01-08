@@ -13,7 +13,9 @@ services:
     networks:
       accsolnet:
         ipv4_address: 172.20.0.12
-
+    volumes:
+      - "./AccSol.EF/Data:C:\\scripts"
+    command: powershell -Command "& {sqlcmd -S localhost -U SA -P P@ssw0rd123 -i C:\\scripts\\CreateDatabase.sql}"
   webapp:
     container_name: accsol
     environment:
@@ -22,14 +24,15 @@ services:
       context: .
       dockerfile: ./AccSol/Dockerfile
     ports:
-      - "8080:80"
+      - "7010:7010"
     depends_on:
       - db
     hostname: AccSol
     networks:
       accsolnet:
         ipv4_address: 172.20.0.10
-
+    expose:
+        - "7010"
   api:
     container_name: accsol.api
     environment:
@@ -38,7 +41,7 @@ services:
       context: .
       dockerfile: ./AccSol.API/Dockerfile
     ports:
-      - "8081:80"
+      - "7040:7040"
     depends_on:
       - db
     hostname: AccSol.API
@@ -46,18 +49,7 @@ services:
       accsolnet:
         ipv4_address: 172.20.0.11
     expose:
-      - "8081"
-  # sqlcmd:
-  #   container_name: sqlcmd
-  #   image: mcr.microsoft.com/windows/servercore:ltsc2019
-  #   depends_on:
-  #     - db
-  #   networks:
-  #     accsolnet:
-  #       ipv4_address: 172.20.0.13
-  #   volumes:
-  #     - ./AccSol.EF/Data:c:\sql
-  #   command: /bin/bash -c "sleep 20 && docker cp /sql/CreateData.sql sqlcmd:/sql/CreateData.sql && docker exec sqlcmd /opt/mssql-tools/bin/sqlcmd -S db -U sa -P P@ssw0rd123 -d AccSol -i CreateData.sql"
+      - "7040"
 
 networks:
   accsolnet:

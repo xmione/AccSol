@@ -5,18 +5,39 @@
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-nanoserver-1809 AS base
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 5049
+EXPOSE 7040
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0-nanoserver-1809 AS build
+# Metadata indicating an image maintainer.
+LABEL maintainer="solomiosisante@gmail.com"
 ARG BUILD_CONFIGURATION=Release
 
+ENV ASPNETCORE_URLS="http://+" 
+ENV ASPNETCORE_HTTP_PORT=5049
+ENV ASPNETCORE_HTTPS_PORT=7040
+ENV ASPNETCORE_Kestrel__Certificates__Default__Password="P@ssw0rd123" 
+ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/src/certs/AccSol.pfx
+
 WORKDIR /src
+COPY ["certs/AccSol.pfx", "certs/"]
 COPY ["AccSol.API/AccSol.API.csproj", "AccSol.API/"]
+COPY ["AccSol.EF/AccSol.EF.csproj", "AccSol.EF/"]
+
 RUN dotnet restore "./AccSol.API/./AccSol.API.csproj"
+
 COPY . .
 WORKDIR "/src/AccSol.API"
 RUN dotnet build "./AccSol.API.csproj" -c %BUILD_CONFIGURATION% -o /app/build
+#RUN dotnet tool install --global dotnet-ef
+#RUN dir C:\Users\ContainerUser\.dotnet\tools /s
+#RUN echo %PATH%
+#USER ContainerAdministrator
+#RUN setx /M PATH "%PATH%;C:\Users\ContainerUser\.dotnet\tools"
+#USER ContainerUser
+#RUN echo %PATH%
+#RUN dotnet-ef database update 
+#RUN sqlcmd -S sqlserver -U sa -P P@ssw0rd123 -i C:\src\AccSol\AccSol.EF\Data\CreateData.sql
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
@@ -25,4 +46,6 @@ RUN dotnet publish "./AccSol.API.csproj" -c %BUILD_CONFIGURATION% -o /app/publis
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+
 ENTRYPOINT ["dotnet", "AccSol.API.dll"]
