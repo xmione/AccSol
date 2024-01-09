@@ -8,15 +8,10 @@ services:
       SA_PASSWORD: "P@ssw0rd123"
       ACCEPT_EULA: "Y"
     ports:
-      - "1433:1433"
+      - "14344:1433"
     hostname: sqlserver
     volumes:
       - "./AccSol.EF/Data:C:\\scripts"    
-    healthcheck:
-      test: ["CMD", "sqlcmd", "-S", "sqlserver", "-U", "SA", "-P", "P@ssw0rd123", "-Q", "SELECT 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
     networks:
       accsolnet:
         ipv4_address: 172.20.0.12

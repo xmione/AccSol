@@ -12,7 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{741C0BC3-BD03-44BA-B6A8-59FB88CFBACD}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
-		api.bat = api.bat
+		AccSol.EF\Data\dockercommit.bat = AccSol.EF\Data\dockercommit.bat
 	EndProjectSection
 EndProject
 Global
