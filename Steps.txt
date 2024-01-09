@@ -53,11 +53,11 @@ Wireless LAN adapter Wi-Fi:
 
 6. Test if you can connect from host.
 
-    sqlcmd -S 192.168.100.33 -U SA -P 'P@ssw0rd123'
+    sqlcmd -S 192.168.100.33 -U SA -P P@ssw0rd123
 
     or
 
-    sqlcmd -S sqlserver -U SA -P 'P@ssw0rd123'
+    sqlcmd -S sqlserver -U SA -P P@ssw0rd123
 
 
 How to create certificate
@@ -91,3 +91,7 @@ How to run docker image to create container
 4. Run docker container from docker image.
 
     docker run --rm -p 7033:7033 --name=accsol.api --network accsolnet -v C:\Databases:C:\Databases accsol.api
+
+:: command: powershell -Command "& {sqlcmd -S sqlserver -U SA -P P@ssw0rd123 -d master -Q 'SELECT * FROM SYS.OBJECTS'; sqlcmd -S sqlserver -U SA -P P@ssw0rd123 -i C:\scripts\CreateDatabase.sql; sqlcmd -S sqlserver -U SA -P P@ssw0rd123 -d master -Q 'SELECT * FROM sys.objects;'}"
+:: command: powershell -Command "& {sqlcmd -S sqlserver -U SA -P P@ssw0rd123 -d master -Q 'SELECT * FROM SYS.OBJECTS'; }"
+

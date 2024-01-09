@@ -5,17 +5,21 @@ services:
     container_name: sqlserver
     image: solomiosisante/sqlserver:dev2019
     environment:
-      SA_PASSWORD: P@ssw0rd123
-      ACCEPT_EULA: Y
+      SA_PASSWORD: "P@ssw0rd123"
+      ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"
     hostname: sqlserver
+    volumes:
+      - "./AccSol.EF/Data:C:\\scripts"    
+    healthcheck:
+      test: ["CMD", "sqlcmd", "-S", "sqlserver", "-U", "SA", "-P", "P@ssw0rd123", "-Q", "SELECT 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     networks:
       accsolnet:
         ipv4_address: 172.20.0.12
-    volumes:
-      - "./AccSol.EF/Data:C:\\scripts"
-    command: powershell -Command "& {sqlcmd -S localhost -U SA -P P@ssw0rd123 -i C:\\scripts\\CreateDatabase.sql}"
   webapp:
     container_name: accsol
     environment:
@@ -50,7 +54,7 @@ services:
         ipv4_address: 172.20.0.11
     expose:
       - "7040"
-
+    
 networks:
   accsolnet:
     name: accsolnet
