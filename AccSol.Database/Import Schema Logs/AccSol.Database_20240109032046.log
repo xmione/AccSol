@@ -1,0 +1,87 @@
+1/9/2024 11:20:46 PM	This log contains information about the import schema operation into project 'AccSol.Database' on computer 'LAPTOP-DADDY' by user 'Work'.
+1/9/2024 11:20:46 PM	Import of database schema has started.
+1/9/2024 11:21:00 PM	Gathering database credentials
+1/9/2024 11:21:00 PM	Gathering database options
+1/9/2024 11:21:00 PM	Gathering generic database scoped configuration option
+1/9/2024 11:21:00 PM	Gathering users
+1/9/2024 11:21:00 PM	Gathering roles
+1/9/2024 11:21:00 PM	Gathering application roles
+1/9/2024 11:21:00 PM	Gathering role memberships
+1/9/2024 11:21:00 PM	Gathering filegroups
+1/9/2024 11:21:00 PM	Gathering full-text catalogs
+1/9/2024 11:21:00 PM	Gathering assemblies
+1/9/2024 11:21:00 PM	Gathering certificates
+1/9/2024 11:21:00 PM	Gathering asymmetric keys
+1/9/2024 11:21:00 PM	Gathering symmetric keys
+1/9/2024 11:21:00 PM	Gathering encrypted symmetric keys
+1/9/2024 11:21:00 PM	Gathering schemas
+1/9/2024 11:21:00 PM	Gathering XML schema collections
+1/9/2024 11:21:00 PM	Gathering user-defined data types
+1/9/2024 11:21:00 PM	Gathering user-defined types
+1/9/2024 11:21:00 PM	Gathering table types
+1/9/2024 11:21:00 PM	Gathering unique keys for table types
+1/9/2024 11:21:00 PM	Gathering primary keys for table types
+1/9/2024 11:21:00 PM	Gathering indexes for table types
+1/9/2024 11:21:00 PM	Gathering check constraints for table types
+1/9/2024 11:21:00 PM	Gathering default constraints for table types
+1/9/2024 11:21:00 PM	Gathering partition functions
+1/9/2024 11:21:00 PM	Gathering partition schemes
+1/9/2024 11:21:00 PM	Gathering functions
+1/9/2024 11:21:00 PM	Gathering encrypted functions
+1/9/2024 11:21:00 PM	Gathering aggregates
+1/9/2024 11:21:00 PM	Gathering procedures
+1/9/2024 11:21:00 PM	Gathering encrypted procedures
+1/9/2024 11:21:00 PM	Gathering tables
+1/9/2024 11:21:00 PM	Gathering primary keys
+1/9/2024 11:21:00 PM	Gathering unique constraints
+1/9/2024 11:21:00 PM	Gathering foreign keys
+1/9/2024 11:21:00 PM	Gathering default constraints
+1/9/2024 11:21:00 PM	Gathering check constraints
+1/9/2024 11:21:00 PM	Gathering views
+1/9/2024 11:21:00 PM	Gathering encrypted views
+1/9/2024 11:21:00 PM	Gathering indexes
+1/9/2024 11:21:00 PM	Gathering statistics
+1/9/2024 11:21:00 PM	Gathering full-text index stoplists
+1/9/2024 11:21:00 PM	Gathering search property lists
+1/9/2024 11:21:00 PM	Gathering search properties
+1/9/2024 11:21:00 PM	Gathering full-text indexes
+1/9/2024 11:21:00 PM	Gathering column store indexes
+1/9/2024 11:21:00 PM	Gathering spatial indexes
+1/9/2024 11:21:00 PM	Gathering XML indexes
+1/9/2024 11:21:00 PM	Gathering Selective XML indexes
+1/9/2024 11:21:01 PM	Gathering encrypted triggers
+1/9/2024 11:21:01 PM	Gathering triggers
+1/9/2024 11:21:01 PM	Gathering encrypted and clr ddl triggers
+1/9/2024 11:21:01 PM	Gathering ddl triggers
+1/9/2024 11:21:01 PM	Creating edge constraints
+1/9/2024 11:21:01 PM	Gathering synonyms
+1/9/2024 11:21:01 PM	Gathering defaults
+1/9/2024 11:21:01 PM	Gathering data constraint uddt bindings
+1/9/2024 11:21:01 PM	Gathering rules
+1/9/2024 11:21:01 PM	Gathering data constraint uddt bindings
+1/9/2024 11:21:01 PM	Gathering message types
+1/9/2024 11:21:01 PM	Gathering queues
+1/9/2024 11:21:01 PM	Gathering contracts
+1/9/2024 11:21:01 PM	Gathering services
+1/9/2024 11:21:01 PM	Gathering event notifications
+1/9/2024 11:21:01 PM	Gathering remote service bindings
+1/9/2024 11:21:01 PM	Gathering broker priorities
+1/9/2024 11:21:01 PM	Gathering signatures
+1/9/2024 11:21:01 PM	Gathering compression options
+1/9/2024 11:21:01 PM	Gathering sequence types
+1/9/2024 11:21:01 PM	Gathering security policies
+1/9/2024 11:21:01 PM	Gather column encryption keys
+1/9/2024 11:21:01 PM	Gathering column master keys
+1/9/2024 11:21:01 PM	Gathering external data sources
+1/9/2024 11:21:01 PM	Gathering external file formats
+1/9/2024 11:21:01 PM	Gathering external tables
+1/9/2024 11:21:01 PM	Gathering extended properties
+1/9/2024 11:21:01 PM	Gathering assemblies
+1/9/2024 11:21:01 PM	Gathering credentials
+1/9/2024 11:21:01 PM	Gathering logins
+1/9/2024 11:21:01 PM	Gathering server audits
+1/9/2024 11:21:02 PM	Scanning project for duplicate elements
+1/9/2024 11:21:02 PM	Finished duplicate element processing
+1/9/2024 11:21:03 PM	Finished importing database.
+1/9/2024 11:21:03 PM	A summary of the import was saved to the following location: C:\repo\AccSol\AccSol.Database\Import Schema Logs\AccSol.Database_20240109032046.log
+1/9/2024 11:21:03 PM	Click Finish to continue...

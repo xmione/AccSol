@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DataComparison>
+  <Version>10</Version>
+  <ConnectionProperties1>
+    <ConnectionString>Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=aspnet-AccSol-4e738ad6-a4fd-4a62-8afa-6641a1ee333c;Integrated Security=True;Persist Security Info=False;Pooling=False;Multiple Active Result Sets=False;Connect Timeout=60;Encrypt=True;Trust Server Certificate=True;Command Timeout=0</ConnectionString>
+    <FullDisplayName>(localdb)\MSSQLLocalDB.aspnet-AccSol-4e738ad6-a4fd-4a62-8afa-6641a1ee333c (LAPTOP-DADDY\Work)</FullDisplayName>
+  </ConnectionProperties1>
+  <ConnectionProperties2>
+    <ConnectionString>Data Source=sqlserver;Initial Catalog=aspnet-AccSol-4e738ad6-a4fd-4a62-8afa-6641a1ee333c;Persist Security Info=True;User ID=sa;Pooling=False;Multiple Active Result Sets=False;Connect Timeout=60;Encrypt=True;Trust Server Certificate=True;Command Timeout=0</ConnectionString>
+    <FullDisplayName>sqlserver.aspnet-AccSol-4e738ad6-a4fd-4a62-8afa-6641a1ee333c (sa)</FullDisplayName>
+  </ConnectionProperties2>
+  <SessionSettings>Default</SessionSettings>
+</DataComparison>

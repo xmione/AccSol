@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		AccSol.EF\Data\dockercommit.bat = AccSol.EF\Data\dockercommit.bat
 	EndProjectSection
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "AccSol.Database", "AccSol.Database\AccSol.Database.sqlproj", "{C9D71B8A-2D0C-424D-B178-CC18E96927C3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,12 @@ Global
 		{B20DEEB1-029C-48C9-9180-21813F126CC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B20DEEB1-029C-48C9-9180-21813F126CC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B20DEEB1-029C-48C9-9180-21813F126CC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9D71B8A-2D0C-424D-B178-CC18E96927C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9D71B8A-2D0C-424D-B178-CC18E96927C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9D71B8A-2D0C-424D-B178-CC18E96927C3}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{C9D71B8A-2D0C-424D-B178-CC18E96927C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9D71B8A-2D0C-424D-B178-CC18E96927C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9D71B8A-2D0C-424D-B178-CC18E96927C3}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
